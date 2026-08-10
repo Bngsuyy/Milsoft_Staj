@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API;
 using TaskManagement.API.Data;
+using TaskManagement.API.Middlewares;
 using TaskManagement.API.Services;
 using TaskManagement.API.Services.Interfaces;
 
@@ -38,7 +39,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// 6. HTTP Request Pipeline Yapılandırması
+// 6. Global Exception Handling Middleware
+app.UseMiddleware<ExceptionMiddleware>();
+
+// 7. HTTP Request Pipeline Yapılandırması
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -49,7 +53,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// 7. Controller Endpoint Mapping
+// 8. Controller Endpoint Mapping
 app.MapControllers();
 
 app.Run();
