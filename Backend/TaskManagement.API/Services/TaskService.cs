@@ -4,6 +4,7 @@ using TaskManagement.API.Data;
 using TaskManagement.API.DTOs;
 using TaskManagement.API.Entities;
 using TaskManagement.API.Enums;
+using TaskManagement.API.Models;
 using TaskManagement.API.Services.Interfaces;
 
 namespace TaskManagement.API.Services
@@ -19,15 +20,15 @@ namespace TaskManagement.API.Services
             _mapper = mapper;
         }
 
-        public async Task<List<TaskItemDto>> GetAllTasksAsync(Guid userId, TaskFilterDto filterDto)
+        public async Task<PagedResult<TaskItemDto>> GetAllTasksAsync(Guid userId, TaskFilterDto filterDto)
         {
-            // 1. Temel Sorgu: Sadece ilgili kullanıcıya ait görevler ve kategorileri
+            // 1. Temel Sorgu
             var query = _context.Tasks
                 .Include(t => t.Category)
                 .Where(t => t.UserId == userId)
                 .AsQueryable();
 
-            // 2. Dinamik Filtreleme Kuralları
+            // 2. Dinamik Filtreleme
             if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
             {
                 var search = filterDto.SearchTerm.Trim().ToLower();
@@ -36,41 +37,44 @@ namespace TaskManagement.API.Services
             }
 
             if (filterDto.Status.HasValue)
-            {
                 query = query.Where(t => t.Status == filterDto.Status.Value);
-            }
 
             if (filterDto.Priority.HasValue)
-            {
                 query = query.Where(t => t.Priority == filterDto.Priority.Value);
-            }
 
             if (filterDto.CategoryId.HasValue)
-            {
                 query = query.Where(t => t.CategoryId == filterDto.CategoryId.Value);
-            }
 
             if (filterDto.StartDate.HasValue)
-            {
                 query = query.Where(t => t.CreatedAt >= filterDto.StartDate.Value);
-            }
 
             if (filterDto.EndDate.HasValue)
-            {
                 query = query.Where(t => t.CreatedAt <= filterDto.EndDate.Value);
-            }
 
-            // 3. Sayfalama (Pagination) Mantığı
+            // 3. Toplam Kayıt Sayısını Hesapla (Sayfalamadan Önce)
+            var totalCount = await query.CountAsync();
+
+            // 4. Sayfalama Değerlerini Doğrula
             var pageNumber = filterDto.PageNumber < 1 ? 1 : filterDto.PageNumber;
             var pageSize = filterDto.PageSize < 1 ? 10 : (filterDto.PageSize > 50 ? 50 : filterDto.PageSize);
 
+            // 5. Skip() ve Take() Uygulama
             var tasks = await query
                 .OrderByDescending(t => t.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return _mapper.Map<List<TaskItemDto>>(tasks);
+            var taskDtos = _mapper.Map<List<TaskItemDto>>(tasks);
+
+            // 6. PagedResult Olarak Paketle
+            return new PagedResult<TaskItemDto>
+            {
+                Items = taskDtos,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task<TaskItemDto> GetTaskByIdAsync(Guid id, Guid userId)
