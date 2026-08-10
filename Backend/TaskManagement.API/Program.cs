@@ -1,4 +1,7 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using TaskManagement.API;
 using TaskManagement.API.Data;
 using TaskManagement.API.Middlewares;
@@ -13,16 +16,40 @@ builder.Services.AddControllers();
 // 2. AutoMapper Servisini Kaydet
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// 3. Servis Katmanı (Service Layer) IoC Kayıtları
+// 3. Servis Katmanı IoC Kayıtları
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IJwtService, JwtService>(); // JWT Servis Kaydı
 
-// 4. Swagger / OpenAPI Servislerini Ekle
+// 4. JWT Authentication Ayarları
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"] ?? "MilsoftTaskManagementSystemSuperSecretKey2026!#";
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+    };
+});
+
+// 5. Swagger / OpenAPI Servislerini Ekle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 5. Veritabanı Provider Seçimi (PostgreSQL veya Oracle)
+// 6. Veritabanı Provider Seçimi (PostgreSQL veya Oracle)
 var provider = builder.Configuration.GetValue<string>("DatabaseProvider");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -39,10 +66,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// 6. Global Exception Handling Middleware
+// 7. Global Exception Handling Middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-// 7. HTTP Request Pipeline Yapılandırması
+// 8. HTTP Request Pipeline Yapılandırması
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -51,9 +78,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// 9. Auth Middleware'leri (Önce Authentication, Sonra Authorization)
+app.UseAuthentication();
 app.UseAuthorization();
 
-// 8. Controller Endpoint Mapping
+// 10. Controller Endpoint Mapping
 app.MapControllers();
 
 app.Run();
