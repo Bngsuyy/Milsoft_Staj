@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API; // AutoMapper MappingProfile için
 using TaskManagement.API.Data;
-using TaskManagement.API.Services; // UserService için eklendi
-using TaskManagement.API.Services.Interfaces; // IUserService için eklendi
+using TaskManagement.API.Services; // UserService ve TaskService için
+using TaskManagement.API.Services.Interfaces; // IUserService ve ITaskService için
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +14,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // 3. Servis Katmanı (Service Layer) IoC Kayıtları
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 // 4. Swagger / OpenAPI Servislerini Ekle
 builder.Services.AddEndpointsApiExplorer();
