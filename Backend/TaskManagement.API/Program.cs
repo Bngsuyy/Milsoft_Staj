@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.API; // AutoMapper MappingProfile için eklendi
 using TaskManagement.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,11 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Controller Servislerini Ekle
 builder.Services.AddControllers();
 
-// 2. Swagger / OpenAPI Servislerini Ekle
+// 2. AutoMapper Servisini Kaydet
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// 3. Swagger / OpenAPI Servislerini Ekle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 3. Veritabanı Provider Seçimi (PostgreSQL veya Oracle)
+// 4. Veritabanı Provider Seçimi (PostgreSQL veya Oracle)
 var provider = builder.Configuration.GetValue<string>("DatabaseProvider");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -27,7 +31,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// 4. HTTP Request Pipeline Yapılandırması
+// 5. HTTP Request Pipeline Yapılandırması
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -38,7 +42,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// 5. Controller Endpoint Mapping
+// 6. Controller Endpoint Mapping
 app.MapControllers();
 
 app.Run();
