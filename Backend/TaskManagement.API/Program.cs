@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using TaskManagement.API;
 using TaskManagement.API.Data;
 using TaskManagement.API.Middlewares;
@@ -10,20 +11,31 @@ using TaskManagement.API.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Controller Servislerini Ekle
+// 1. CORS Ayarı (Frontend Erişimi İçin)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// 2. Controller Servislerini Ekle
 builder.Services.AddControllers();
 
-// 2. AutoMapper Servisini Kaydet
+// 3. AutoMapper Servisini Kaydet
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// 3. Servis Katmanı IoC Kayıtları
+// 4. Servis Katmanı IoC Kayıtları
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IJwtService, JwtService>(); // JWT Servis Kaydı
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// 4. JWT Authentication Ayarları
+// 5. JWT Authentication Ayarları
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"] ?? "MilsoftTaskManagementSystemSuperSecretKey2026!#";
 
@@ -46,11 +58,38 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 5. Swagger / OpenAPI Servislerini Ekle
+// 6. Swagger JWT Bearer Güvenlik Dokümantasyonu
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TaskManagement.API", Version = "v1" });
 
-// 6. Veritabanı Provider Seçimi (PostgreSQL veya Oracle)
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Örnek: 'Bearer eyJhbGciOi...'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// 7. Veritabanı Provider Seçimi (PostgreSQL veya Oracle)
 var provider = builder.Configuration.GetValue<string>("DatabaseProvider");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -67,10 +106,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// 7. Global Exception Handling Middleware
+// 8. Global Exception Handling Middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-// 8. HTTP Request Pipeline Yapılandırması
+// 9. HTTP Request Pipeline Yapılandırması
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -79,11 +118,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// 9. Auth Middleware'leri (Önce Authentication, Sonra Authorization)
+// 10. CORS Middleware
+app.UseCors("AllowFrontend");
+
+// 11. Auth Middleware'leri
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 10. Controller Endpoint Mapping
+// 12. Controller Endpoint Mapping
 app.MapControllers();
 
 app.Run();

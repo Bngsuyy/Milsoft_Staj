@@ -60,7 +60,16 @@ namespace TaskManagement.API.Services
                 query = query.Where(t => t.CreatedAt <= filterDto.EndDate.Value);
             }
 
-            var tasks = await query.OrderByDescending(t => t.CreatedAt).ToListAsync();
+            // 3. Sayfalama (Pagination) Mantığı
+            var pageNumber = filterDto.PageNumber < 1 ? 1 : filterDto.PageNumber;
+            var pageSize = filterDto.PageSize < 1 ? 10 : (filterDto.PageSize > 50 ? 50 : filterDto.PageSize);
+
+            var tasks = await query
+                .OrderByDescending(t => t.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
             return _mapper.Map<List<TaskItemDto>>(tasks);
         }
 
@@ -78,7 +87,6 @@ namespace TaskManagement.API.Services
 
         public async Task<TaskItemDto> CreateTaskAsync(CreateTaskDto createTaskDto, Guid userId)
         {
-            // Kategori kontrolü (Eğer bir kategori ID'si verildiyse veritabanında var mı?)
             if (createTaskDto.CategoryId.HasValue)
             {
                 var categoryExists = await _context.Categories
@@ -96,7 +104,6 @@ namespace TaskManagement.API.Services
             await _context.Tasks.AddAsync(task);
             await _context.SaveChangesAsync();
 
-            // Kategori detayını DTO'ya aktarmak için tekrar veritabanından ilişkili çekiyoruz
             return await GetTaskByIdAsync(task.Id, userId);
         }
 
@@ -106,7 +113,6 @@ namespace TaskManagement.API.Services
             if (task == null)
                 throw new KeyNotFoundException("Güncellenecek görev bulunamadı.");
 
-            // Kategori kontrolü
             if (updateTaskDto.CategoryId.HasValue)
             {
                 var categoryExists = await _context.Categories
@@ -115,7 +121,6 @@ namespace TaskManagement.API.Services
                     throw new InvalidOperationException("Geçersiz kategori seçimi.");
             }
 
-            // Durum 'Completed' yapıldıysa Tamamlanma Tarihini güncelle
             if (updateTaskDto.Status == Status.Completed && task.Status != Status.Completed)
             {
                 task.CompletedAt = DateTime.UtcNow;
