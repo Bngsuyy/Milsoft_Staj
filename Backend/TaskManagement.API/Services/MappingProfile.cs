@@ -9,16 +9,19 @@ namespace TaskManagement.API
         public MappingProfile()
         {
             // User Mappings
-            CreateMap<UserRegisterDto, User>();
-            CreateMap<User, UserResponseDto>();
+            CreateMap<CreateUserDto, User>();
+            CreateMap<UpdateUserDto, User>();
+            CreateMap<User, UserDto>();
 
             // Category Mappings
-            CreateMap<CategoryCreateDto, Category>();
-            CreateMap<Category, CategoryResponseDto>();
+            CreateMap<CreateCategoryDto, Category>();
+            CreateMap<UpdateCategoryDto, Category>();
+            CreateMap<Category, CategoryDto>();
 
             // Task Mappings
-            CreateMap<TaskCreateDto, TaskItem>();
-            CreateMap<TaskItem, TaskResponseDto>();
+            CreateMap<CreateTaskDto, TaskItem>();
+            CreateMap<UpdateTaskDto, TaskItem>();
+            CreateMap<TaskItem, TaskItemDto>();
         }
     }
 }
