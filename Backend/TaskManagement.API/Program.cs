@@ -21,6 +21,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IJwtService, JwtService>(); // JWT Servis Kaydı
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // 4. JWT Authentication Ayarları
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
