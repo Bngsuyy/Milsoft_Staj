@@ -1,1 +1,52 @@
-# Database Design Documentation
+# Database Design
+
+## Tablolar
+
+- `Users`: kullanıcı ve BCrypt parola hash'i. `Username` ve `Email` benzersizdir.
+- `Categories`: kullanıcıya ait kategori. `(UserId, Name)` benzersizdir.
+- `Tasks`: görev, öncelik, durum, tarih ve kategori ilişkisi.
+- `TaskComments`: göreve ve yorum sahibine bağlı metin kayıtları.
+- `TaskAttachments`: fiziksel dosyanın güvenli göreli yolu ve metadatası.
+
+## İlişkiler ve silme davranışı
+
+- User -> Categories: one-to-many, cascade delete.
+- User -> Tasks: one-to-many, cascade delete.
+- User -> TaskComments: one-to-many, cascade delete.
+- Category -> Tasks: one-to-many, kategori silinince `CategoryId` null olur.
+- Task -> TaskComments: one-to-many, cascade delete.
+- Task -> TaskAttachments: one-to-many, cascade delete.
+
+`Priority` için 1-5, `Status` için 0-3 check constraint'leri vardır. Görev sorguları için `(UserId, Status)` ve `(UserId, DueDate)` indeksleri kullanılır.
+
+## PostgreSQL
+
+Mevcut proje veritabanını migration ile güncelleyin:
+
+```powershell
+dotnet ef database update --project Backend/TaskManagement.API/TaskManagement.API.csproj
+```
+
+Temiz ve migration kullanmayan bir kurulum için:
+
+```powershell
+psql -U postgres -d TaskManagementDb -f Database/Scripts/01_Initial_Schema_PostgreSQL.sql
+```
+
+## Oracle
+
+Oracle servisi ve kullanıcı şeması hazırlandıktan sonra `Database/Scripts/02_Initial_Schema_Oracle.sql` dosyasını SQL*Plus veya SQL Developer ile çalıştırın. Ardından:
+
+```text
+DatabaseProvider=Oracle
+ConnectionStrings__Oracle=User Id=taskmanagement;Password=...;Data Source=localhost:1521/XEPDB1
+```
+
+EF migration dosyaları PostgreSQL provider'ı ile üretilmiştir. Oracle temiz kurulumu için Oracle scripti kullanılmalıdır; runtime `UseOracle` üzerinden aynı entity modelini kullanır.
+
+## Seed
+
+Her iki kurulumda demo kullanıcı bulunur:
+
+- Username: `demouser`
+- Password: `Demo123!`

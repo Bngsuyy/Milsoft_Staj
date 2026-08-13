@@ -23,6 +23,7 @@ namespace TaskManagement.API.DTOs
 
         [Required(ErrorMessage = "E-posta adresi zorunludur.")]
         [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz.")]
+        [StringLength(100, ErrorMessage = "E-posta adresi en fazla 100 karakter olabilir.")]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Şifre zorunludur.")]
@@ -50,6 +51,7 @@ namespace TaskManagement.API.DTOs
         public string LastName { get; set; } = string.Empty;
 
         [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz.")]
+        [StringLength(100, ErrorMessage = "E-posta adresi en fazla 100 karakter olabilir.")]
         public string? Email { get; set; }
     }
 

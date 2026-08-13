@@ -22,12 +22,13 @@ namespace TaskManagement.API.DTOs
     public class CreateTaskDto
     {
         [Required(ErrorMessage = "Görev başlığı zorunludur.")]
-        [StringLength(100, ErrorMessage = "Başlık en fazla 100 karakter olabilir.")]
+        [StringLength(200, ErrorMessage = "Başlık en fazla 200 karakter olabilir.")]
         public string Title { get; set; } = string.Empty;
 
-        [StringLength(1000, ErrorMessage = "Açıklama en fazla 1000 karakter olabilir.")]
+        [StringLength(2000, ErrorMessage = "Açıklama en fazla 2000 karakter olabilir.")]
         public string? Description { get; set; }
 
+        [EnumDataType(typeof(Priority), ErrorMessage = "Geçersiz öncelik değeri.")]
         public Priority Priority { get; set; } = Priority.Normal;
 
         public DateTime? DueDate { get; set; }
@@ -39,14 +40,16 @@ namespace TaskManagement.API.DTOs
     public class UpdateTaskDto
     {
         [Required(ErrorMessage = "Görev başlığı zorunludur.")]
-        [StringLength(100, ErrorMessage = "Başlık en fazla 100 karakter olabilir.")]
+        [StringLength(200, ErrorMessage = "Başlık en fazla 200 karakter olabilir.")]
         public string Title { get; set; } = string.Empty;
 
-        [StringLength(1000, ErrorMessage = "Açıklama en fazla 1000 karakter olabilir.")]
+        [StringLength(2000, ErrorMessage = "Açıklama en fazla 2000 karakter olabilir.")]
         public string? Description { get; set; }
 
+        [EnumDataType(typeof(Priority), ErrorMessage = "Geçersiz öncelik değeri.")]
         public Priority Priority { get; set; }
 
+        [EnumDataType(typeof(Status), ErrorMessage = "Geçersiz görev durumu.")]
         public Status Status { get; set; }
 
         public DateTime? DueDate { get; set; }
@@ -67,5 +70,15 @@ namespace TaskManagement.API.DTOs
         // Pagination (Sayfalama) Parametreleri
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+    }
+
+    public class TaskStatisticsDto
+    {
+        public int Total { get; set; }
+        public int Pending { get; set; }
+        public int InProgress { get; set; }
+        public int Completed { get; set; }
+        public int Cancelled { get; set; }
+        public int Overdue { get; set; }
     }
 }

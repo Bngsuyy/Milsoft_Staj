@@ -17,7 +17,55 @@ namespace TaskManagement.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // PDF Şemasına Uygun Silme Davranışları (FluentAPI)
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.Username).HasMaxLength(50).IsRequired();
+                entity.Property(u => u.Email).HasMaxLength(100).IsRequired();
+                entity.Property(u => u.PasswordHash).HasMaxLength(255).IsRequired();
+                entity.Property(u => u.FirstName).HasMaxLength(50).IsRequired();
+                entity.Property(u => u.LastName).HasMaxLength(50).IsRequired();
+                entity.HasIndex(u => u.Username).IsUnique();
+                entity.HasIndex(u => u.Email).IsUnique();
+            });
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.Property(c => c.Name).HasMaxLength(100).IsRequired();
+                entity.Property(c => c.Description).HasMaxLength(500);
+                entity.Property(c => c.Color).HasMaxLength(7).IsRequired();
+                entity.HasIndex(c => new { c.UserId, c.Name }).IsUnique();
+            });
+
+            modelBuilder.Entity<TaskItem>(entity =>
+            {
+                entity.Property(t => t.Title).HasMaxLength(200).IsRequired();
+                entity.Property(t => t.Description).HasMaxLength(2000);
+                entity.ToTable(tableBuilder =>
+                {
+                    tableBuilder.HasCheckConstraint(
+                        "CK_Tasks_Priority",
+                        "\"Priority\" BETWEEN 1 AND 5");
+                    tableBuilder.HasCheckConstraint(
+                        "CK_Tasks_Status",
+                        "\"Status\" BETWEEN 0 AND 3");
+                });
+                entity.HasIndex(t => new { t.UserId, t.Status });
+                entity.HasIndex(t => new { t.UserId, t.DueDate });
+            });
+
+            modelBuilder.Entity<TaskAttachment>(entity =>
+            {
+                entity.Property(a => a.FileName).HasMaxLength(255).IsRequired();
+                entity.Property(a => a.FilePath).HasMaxLength(500).IsRequired();
+                entity.Property(a => a.ContentType).HasMaxLength(100).IsRequired();
+            });
+
+            modelBuilder.Entity<TaskComment>(entity =>
+            {
+                entity.Property(c => c.Comment).HasMaxLength(2000).IsRequired();
+            });
+
+            // PDF şemasına uygun silme davranışları (FluentAPI)
 
             // User silinirse ona ait Task, Category ve Comment'ler silinsin (CASCADE)
             modelBuilder.Entity<TaskItem>()
@@ -58,18 +106,19 @@ namespace TaskManagement.API.Data
                 .HasForeignKey(tc => tc.TaskId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Seed Data (Demo Kullanıcı Ekleme)
+            // Migration modelinin her çalıştırmada değişmemesi için seed değerleri sabittir.
             var demoUserGuid = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var seedDate = new DateTime(2025, 8, 18, 7, 0, 0, DateTimeKind.Utc);
             modelBuilder.Entity<User>().HasData(new User
             {
                 Id = demoUserGuid,
                 Username = "demouser",
                 Email = "demo@example.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Demo123!"),
+                PasswordHash = "$2a$11$dPWaszZ8p.60zHUUpZRNr.1.2gaCXoeYz1FqAR/U.ZYttsmttFNmS",
                 FirstName = "Demo",
                 LastName = "User",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate,
                 IsActive = true
             });
         }

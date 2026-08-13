@@ -21,7 +21,7 @@ namespace TaskManagement.API.Services
 
         public async Task<UserDto> GetByIdAsync(Guid id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
             if (user == null)
                 throw new KeyNotFoundException("Kullanıcı bulunamadı.");
 
@@ -30,7 +30,9 @@ namespace TaskManagement.API.Services
 
         public async Task<UserDto> GetByUsernameAsync(string username)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var normalizedUsername = username.Trim().ToLowerInvariant();
+            var user = await _context.Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Username == normalizedUsername);
             if (user == null)
                 throw new KeyNotFoundException("Kullanıcı bulunamadı.");
 
@@ -39,20 +41,27 @@ namespace TaskManagement.API.Services
 
         public async Task<List<UserDto>> GetAllAsync()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _context.Users.AsNoTracking().ToListAsync();
             return _mapper.Map<List<UserDto>>(users);
         }
 
         public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto)
         {
             // İş Kuralı: Aynı e-posta veya kullanıcı adı var mı?
-            if (await _context.Users.AnyAsync(u => u.Username == createUserDto.Username))
+            var username = createUserDto.Username.Trim().ToLowerInvariant();
+            var email = createUserDto.Email.Trim().ToLowerInvariant();
+
+            if (await _context.Users.AnyAsync(u => u.Username == username))
                 throw new InvalidOperationException("Bu kullanıcı adı zaten alınmış.");
 
-            if (await _context.Users.AnyAsync(u => u.Email == createUserDto.Email))
+            if (await _context.Users.AnyAsync(u => u.Email == email))
                 throw new InvalidOperationException("Bu e-posta adresi zaten kullanımda.");
 
             var user = _mapper.Map<User>(createUserDto);
+            user.Username = username;
+            user.Email = email;
+            user.FirstName = createUserDto.FirstName.Trim();
+            user.LastName = createUserDto.LastName.Trim();
             
             // Güvenlik Kuralı: Şifre asla düz metin saklanmaz, BCrypt ile hash'lenir
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
@@ -72,7 +81,20 @@ namespace TaskManagement.API.Services
             if (user == null)
                 throw new KeyNotFoundException("Güncellenecek kullanıcı bulunamadı.");
 
+            if (!string.IsNullOrWhiteSpace(updateUserDto.Email))
+            {
+                var email = updateUserDto.Email.Trim().ToLowerInvariant();
+                var emailInUse = await _context.Users
+                    .AnyAsync(u => u.Id != id && u.Email == email);
+                if (emailInUse)
+                    throw new InvalidOperationException("Bu e-posta adresi zaten kullanımda.");
+
+                updateUserDto.Email = email;
+            }
+
             _mapper.Map(updateUserDto, user);
+            user.FirstName = updateUserDto.FirstName.Trim();
+            user.LastName = updateUserDto.LastName.Trim();
             user.UpdatedAt = DateTime.UtcNow;
 
             _context.Users.Update(user);

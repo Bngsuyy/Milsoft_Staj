@@ -16,10 +16,10 @@ namespace TaskManagement.API.DTOs
     public class CreateCategoryDto
     {
         [Required(ErrorMessage = "Kategori adı zorunludur.")]
-        [StringLength(50, ErrorMessage = "Kategori adı en fazla 50 karakter olabilir.")]
+        [StringLength(100, ErrorMessage = "Kategori adı en fazla 100 karakter olabilir.")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(200, ErrorMessage = "Açıklama en fazla 200 karakter olabilir.")]
+        [StringLength(500, ErrorMessage = "Açıklama en fazla 500 karakter olabilir.")]
         public string? Description { get; set; }
 
         [RegularExpression("^#(?:[0-9a-fA-F]{3}){1,2}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz (ör: #FF5733).")]
@@ -30,10 +30,10 @@ namespace TaskManagement.API.DTOs
     public class UpdateCategoryDto
     {
         [Required(ErrorMessage = "Kategori adı zorunludur.")]
-        [StringLength(50, ErrorMessage = "Kategori adı en fazla 50 karakter olabilir.")]
+        [StringLength(100, ErrorMessage = "Kategori adı en fazla 100 karakter olabilir.")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(200, ErrorMessage = "Açıklama en fazla 200 karakter olabilir.")]
+        [StringLength(500, ErrorMessage = "Açıklama en fazla 500 karakter olabilir.")]
         public string? Description { get; set; }
 
         [RegularExpression("^#(?:[0-9a-fA-F]{3}){1,2}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz.")]

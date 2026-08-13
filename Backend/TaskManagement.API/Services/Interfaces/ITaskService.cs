@@ -10,5 +10,7 @@ namespace TaskManagement.API.Services.Interfaces
         Task<TaskItemDto> CreateTaskAsync(CreateTaskDto createTaskDto, Guid userId);
         Task<TaskItemDto> UpdateTaskAsync(Guid id, UpdateTaskDto updateTaskDto, Guid userId);
         Task<bool> DeleteTaskAsync(Guid id, Guid userId);
+        Task<PagedResult<TaskItemDto>> GetOverdueTasksAsync(Guid userId, int pageNumber, int pageSize);
+        Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId);
     }
 }

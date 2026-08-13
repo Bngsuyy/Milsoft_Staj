@@ -21,6 +21,7 @@ namespace TaskManagement.API.Services
         public async Task<List<CategoryDto>> GetAllCategoriesAsync(Guid userId)
         {
             var categories = await _context.Categories
+                .AsNoTracking()
                 .Where(c => c.UserId == userId)
                 .OrderBy(c => c.Name)
                 .ToListAsync();
@@ -31,6 +32,7 @@ namespace TaskManagement.API.Services
         public async Task<CategoryDto> GetCategoryByIdAsync(Guid id, Guid userId)
         {
             var category = await _context.Categories
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
             if (category == null)
@@ -42,13 +44,17 @@ namespace TaskManagement.API.Services
         public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategoryDto, Guid userId)
         {
             // İş Kuralı: Aynı isimde kategori var mı?
+            var name = createCategoryDto.Name.Trim();
+            var normalizedName = name.ToLowerInvariant();
             var exists = await _context.Categories
-                .AnyAsync(c => c.UserId == userId && c.Name.ToLower() == createCategoryDto.Name.ToLower());
+                .AnyAsync(c => c.UserId == userId && c.Name.ToLower() == normalizedName);
 
             if (exists)
                 throw new InvalidOperationException("Bu isimde bir kategori zaten mevcut.");
 
             var category = _mapper.Map<Category>(createCategoryDto);
+            category.Name = name;
+            category.Description = createCategoryDto.Description?.Trim();
             category.UserId = userId;
             category.CreatedAt = DateTime.UtcNow;
 
@@ -67,16 +73,20 @@ namespace TaskManagement.API.Services
                 throw new KeyNotFoundException("Güncellenecek kategori bulunamadı.");
 
             // İsim değişiyorsa başka bir kategoriyle çakışıyor mu kontrol et
-            if (category.Name.ToLower() != updateCategoryDto.Name.ToLower())
+            var name = updateCategoryDto.Name.Trim();
+            var normalizedName = name.ToLowerInvariant();
+            if (category.Name.ToLower() != normalizedName)
             {
                 var exists = await _context.Categories
-                    .AnyAsync(c => c.UserId == userId && c.Name.ToLower() == updateCategoryDto.Name.ToLower());
+                    .AnyAsync(c => c.Id != id && c.UserId == userId && c.Name.ToLower() == normalizedName);
 
                 if (exists)
                     throw new InvalidOperationException("Bu isimde başka bir kategori zaten mevcut.");
             }
 
             _mapper.Map(updateCategoryDto, category);
+            category.Name = name;
+            category.Description = updateCategoryDto.Description?.Trim();
 
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();

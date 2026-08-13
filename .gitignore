@@ -32,6 +32,8 @@ dist/
 *.db
 *.sqlite
 *.sqlite3
+Backend/TaskManagement.API/App_Data/uploads/
+tmp/
 
 ## Node.js / Frontend
 node_modules/

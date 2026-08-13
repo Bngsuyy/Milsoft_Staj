@@ -22,18 +22,25 @@ namespace TaskManagement.API.Services
 
         public async Task<UserDto> RegisterAsync(CreateUserDto registerDto)
         {
-            if (await _context.Users.AnyAsync(u => u.Username == registerDto.Username))
+            var username = registerDto.Username.Trim().ToLowerInvariant();
+            var email = registerDto.Email.Trim().ToLowerInvariant();
+
+            if (await _context.Users.AnyAsync(u => u.Username == username))
             {
                 throw new InvalidOperationException("Bu kullanıcı adı zaten alınmış.");
             }
 
-            if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
+            if (await _context.Users.AnyAsync(u => u.Email == email))
             {
                 throw new InvalidOperationException("Bu e-posta adresi zaten kullanımda.");
             }
 
             var user = _mapper.Map<User>(registerDto);
-            
+            user.Username = username;
+            user.Email = email;
+            user.FirstName = registerDto.FirstName.Trim();
+            user.LastName = registerDto.LastName.Trim();
+
             // Şifre BCrypt ile hash'leniyor
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
             user.CreatedAt = DateTime.UtcNow;
@@ -48,7 +55,8 @@ namespace TaskManagement.API.Services
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginDto.Username);
+            var username = loginDto.Username.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             
             // Kullanıcı yoksa veya şifre BCrypt doğrulamasından geçmezse
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))

@@ -10,7 +10,9 @@ namespace TaskManagement.API
         {
             // User Mappings
             CreateMap<CreateUserDto, User>();
-            CreateMap<UpdateUserDto, User>();
+            CreateMap<UpdateUserDto, User>()
+                .ForMember(destination => destination.Email,
+                    options => options.Condition(source => !string.IsNullOrWhiteSpace(source.Email)));
             CreateMap<User, UserDto>();
 
             // Category Mappings
@@ -22,6 +24,12 @@ namespace TaskManagement.API
             CreateMap<CreateTaskDto, TaskItem>();
             CreateMap<UpdateTaskDto, TaskItem>();
             CreateMap<TaskItem, TaskItemDto>();
+
+            // Comment and attachment mappings
+            CreateMap<TaskComment, TaskCommentDto>()
+                .ForMember(destination => destination.Username,
+                    options => options.MapFrom(source => source.User.Username));
+            CreateMap<TaskAttachment, TaskAttachmentDto>();
         }
     }
 }

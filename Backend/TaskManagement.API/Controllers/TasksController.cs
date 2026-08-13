@@ -44,6 +44,20 @@ namespace TaskManagement.API.Controllers
             return Ok(task);
         }
 
+        [HttpGet("overdue")]
+        public async Task<IActionResult> GetOverdue([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var tasks = await _taskService.GetOverdueTasksAsync(GetUserId(), pageNumber, pageSize);
+            return Ok(tasks);
+        }
+
+        [HttpGet("statistics")]
+        public async Task<IActionResult> GetStatistics()
+        {
+            var statistics = await _taskService.GetStatisticsAsync(GetUserId());
+            return Ok(statistics);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTaskDto createTaskDto)
         {

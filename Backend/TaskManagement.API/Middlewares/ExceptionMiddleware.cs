@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Models;
 
 namespace TaskManagement.API.Middlewares
@@ -24,7 +25,10 @@ namespace TaskManagement.API.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Bir hata oluştu: {ex.Message}");
+                if (httpContext.Response.HasStarted)
+                    throw;
+
+                _logger.LogError(ex, "İstek işlenirken bir hata oluştu: {Message}", ex.Message);
                 await HandleExceptionAsync(httpContext, ex);
             }
         }
@@ -33,7 +37,10 @@ namespace TaskManagement.API.Middlewares
         {
             context.Response.ContentType = "application/json";
 
-            var response = new ErrorDetails();
+            var response = new ErrorDetails
+            {
+                TraceId = context.TraceIdentifier
+            };
 
             switch (exception)
             {
@@ -45,9 +52,22 @@ namespace TaskManagement.API.Middlewares
 
                 case InvalidOperationException:
                 case ArgumentException:
+                case BadHttpRequestException:
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     response.StatusCode = context.Response.StatusCode;
                     response.Message = exception.Message;
+                    break;
+
+                case UnauthorizedAccessException:
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    response.StatusCode = context.Response.StatusCode;
+                    response.Message = exception.Message;
+                    break;
+
+                case DbUpdateException:
+                    context.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    response.StatusCode = context.Response.StatusCode;
+                    response.Message = "Kayıt, benzersiz alan veya ilişki kuralıyla çakışıyor.";
                     break;
 
                 default:

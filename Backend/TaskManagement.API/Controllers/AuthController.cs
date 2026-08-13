@@ -24,7 +24,7 @@ namespace TaskManagement.API.Controllers
         public async Task<IActionResult> Register([FromBody] CreateUserDto registerDto)
         {
             var user = await _authService.RegisterAsync(registerDto);
-            return Ok(user);
+            return StatusCode(StatusCodes.Status201Created, user);
         }
 
         [HttpPost("login")]
@@ -39,14 +39,25 @@ namespace TaskManagement.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetProfile()
         {
+            var user = await _userService.GetByIdAsync(GetUserId());
+            return Ok(user);
+        }
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserDto updateUserDto)
+        {
+            var user = await _userService.UpdateUserAsync(GetUserId(), updateUserDto);
+            return Ok(user);
+        }
+
+        private Guid GetUserId()
+        {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized("Geçersiz token bilgisi.");
-            }
+                throw new UnauthorizedAccessException("Geçersiz token bilgisi.");
 
-            var user = await _userService.GetByIdAsync(userId);
-            return Ok(user);
+            return userId;
         }
     }
 }

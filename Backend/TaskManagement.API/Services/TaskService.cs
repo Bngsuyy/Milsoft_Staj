@@ -24,6 +24,7 @@ namespace TaskManagement.API.Services
         {
             // 1. Temel Sorgu
             var query = _context.Tasks
+                .AsNoTracking()
                 .Include(t => t.Category)
                 .Where(t => t.UserId == userId)
                 .AsQueryable();
@@ -46,10 +47,16 @@ namespace TaskManagement.API.Services
                 query = query.Where(t => t.CategoryId == filterDto.CategoryId.Value);
 
             if (filterDto.StartDate.HasValue)
-                query = query.Where(t => t.CreatedAt >= filterDto.StartDate.Value);
+            {
+                var startDate = NormalizeUtc(filterDto.StartDate.Value);
+                query = query.Where(t => t.CreatedAt >= startDate);
+            }
 
             if (filterDto.EndDate.HasValue)
-                query = query.Where(t => t.CreatedAt <= filterDto.EndDate.Value);
+            {
+                var endDate = NormalizeUtc(filterDto.EndDate.Value);
+                query = query.Where(t => t.CreatedAt <= endDate);
+            }
 
             // 3. Toplam Kayıt Sayısını Hesapla (Sayfalamadan Önce)
             var totalCount = await query.CountAsync();
@@ -80,6 +87,7 @@ namespace TaskManagement.API.Services
         public async Task<TaskItemDto> GetTaskByIdAsync(Guid id, Guid userId)
         {
             var task = await _context.Tasks
+                .AsNoTracking()
                 .Include(t => t.Category)
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
@@ -100,6 +108,9 @@ namespace TaskManagement.API.Services
             }
 
             var task = _mapper.Map<TaskItem>(createTaskDto);
+            task.Title = createTaskDto.Title.Trim();
+            task.Description = createTaskDto.Description?.Trim();
+            task.DueDate = EnsureUtc(createTaskDto.DueDate);
             task.UserId = userId;
             task.Status = Status.Pending;
             task.CreatedAt = DateTime.UtcNow;
@@ -135,6 +146,9 @@ namespace TaskManagement.API.Services
             }
 
             _mapper.Map(updateTaskDto, task);
+            task.Title = updateTaskDto.Title.Trim();
+            task.Description = updateTaskDto.Description?.Trim();
+            task.DueDate = EnsureUtc(updateTaskDto.DueDate);
             task.UpdatedAt = DateTime.UtcNow;
 
             _context.Tasks.Update(task);
@@ -152,6 +166,74 @@ namespace TaskManagement.API.Services
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<PagedResult<TaskItemDto>> GetOverdueTasksAsync(
+            Guid userId,
+            int pageNumber,
+            int pageSize)
+        {
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 10 : Math.Min(pageSize, 50);
+            var now = DateTime.UtcNow;
+
+            var query = _context.Tasks
+                .AsNoTracking()
+                .Include(task => task.Category)
+                .Where(task => task.UserId == userId
+                    && task.DueDate.HasValue
+                    && task.DueDate.Value < now
+                    && task.Status != Status.Completed
+                    && task.Status != Status.Cancelled);
+
+            var totalCount = await query.CountAsync();
+            var tasks = await query
+                .OrderBy(task => task.DueDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<TaskItemDto>
+            {
+                Items = _mapper.Map<List<TaskItemDto>>(tasks),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
+        public async Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId)
+        {
+            var now = DateTime.UtcNow;
+            var query = _context.Tasks.AsNoTracking().Where(task => task.UserId == userId);
+
+            return new TaskStatisticsDto
+            {
+                Total = await query.CountAsync(),
+                Pending = await query.CountAsync(task => task.Status == Status.Pending),
+                InProgress = await query.CountAsync(task => task.Status == Status.InProgress),
+                Completed = await query.CountAsync(task => task.Status == Status.Completed),
+                Cancelled = await query.CountAsync(task => task.Status == Status.Cancelled),
+                Overdue = await query.CountAsync(task => task.DueDate.HasValue
+                    && task.DueDate.Value < now
+                    && task.Status != Status.Completed
+                    && task.Status != Status.Cancelled)
+            };
+        }
+
+        private static DateTime? EnsureUtc(DateTime? value)
+        {
+            return value.HasValue ? NormalizeUtc(value.Value) : null;
+        }
+
+        private static DateTime NormalizeUtc(DateTime value)
+        {
+            return value.Kind switch
+            {
+                DateTimeKind.Utc => value,
+                DateTimeKind.Local => value.ToUniversalTime(),
+                _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+            };
         }
     }
 }
