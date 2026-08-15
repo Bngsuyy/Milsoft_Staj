@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { PrimeReactProvider } from '@primereact/core'
+import { PrimeReactProvider } from 'primereact/api'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './index.css'
@@ -9,7 +9,7 @@ import { AuthProvider } from './contexts'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <PrimeReactProvider ripple>
+    <PrimeReactProvider value={{ ripple: true }}>
       <AuthProvider>
         <App />
       </AuthProvider>

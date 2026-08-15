@@ -2,16 +2,16 @@ import { Link } from 'react-router-dom'
 
 export function NotFoundPage() {
   return (
-    <main className="app-page flex align-items-center justify-content-center">
-      <section className="foundation-card foundation-hero text-center">
-        <span className="status-pill mx-auto">404</span>
-        <h1 className="foundation-title mx-auto">Sayfa bulunamadı</h1>
-        <p className="foundation-copy mx-auto">Aradığınız adres bu uygulamada tanımlı değil.</p>
-        <Link className="not-found-link" to="/">
-          <i className="pi pi-arrow-left" aria-hidden="true" />
-          Ana sayfaya dön
+    <div className="content-page not-found-page">
+      <section className="empty-state-card not-found-card">
+        <span className="error-code">404</span>
+        <h2>Sayfa bulunamadı</h2>
+        <p>Aradığın adres taşınmış, silinmiş veya hiç oluşturulmamış olabilir.</p>
+        <Link className="primary-action-button" to="/dashboard">
+          <i className="pi pi-home" aria-hidden="true" />
+          Dashboard’a dön
         </Link>
       </section>
-    </main>
+    </div>
   )
 }

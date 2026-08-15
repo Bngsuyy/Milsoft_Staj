@@ -1,66 +1,65 @@
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks'
 
-const dateFormatter = new Intl.DateTimeFormat('tr-TR', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-})
+const quickLinks = [
+  {
+    to: '/tasks',
+    icon: 'pi-list-check',
+    title: 'Görevler',
+    description: 'Görevlerini görüntüle, filtrele ve yönet.',
+  },
+  {
+    to: '/categories',
+    icon: 'pi-tags',
+    title: 'Kategoriler',
+    description: 'Görevlerini düzenlemek için kategorileri kullan.',
+  },
+  {
+    to: '/profile',
+    icon: 'pi-user',
+    title: 'Profil',
+    description: 'Hesap bilgilerini görüntüle ve güncelle.',
+  },
+]
 
 export function DashboardPage() {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-
-  function handleLogout() {
-    logout()
-    navigate('/login', { replace: true })
-  }
-
-  if (!user) {
-    return null
-  }
+  const { user } = useAuth()
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-header">
-        <div className="dashboard-brand">
-          <span className="app-mark inline-flex align-items-center justify-content-center">
-            <i className="pi pi-check-square" aria-hidden="true" />
-          </span>
-          <div>
-            <strong>Task Management</strong>
-            <span>Frontend</span>
-          </div>
-        </div>
-        <button className="secondary-button" type="button" onClick={handleLogout}>
-          <i className="pi pi-sign-out" aria-hidden="true" />
-          Çıkış yap
-        </button>
-      </header>
-
-      <section className="dashboard-content">
+    <div className="content-page dashboard-content-page">
+      <section className="welcome-panel">
         <div>
-          <span className="status-pill">Oturum aktif</span>
-          <h1>Hoş geldin, {user.firstName}.</h1>
-          <p>Authentication akışı tamamlandı. Sıradaki aşama uygulama layout’u ve görev ekranları.</p>
+          <span className="page-eyebrow">Hoş geldin</span>
+          <h2>{user?.firstName}, bugün ne yapmak istersin?</h2>
+          <p>Görevlerini tek çalışma alanından planlayabilir ve takip edebilirsin.</p>
         </div>
+        <span className="welcome-panel-icon" aria-hidden="true">
+          <i className="pi pi-sparkles" />
+        </span>
+      </section>
 
-        <div className="profile-card">
-          <div className="profile-avatar" aria-hidden="true">
-            {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+      <section aria-labelledby="quick-links-title">
+        <div className="section-heading">
+          <div>
+            <span className="page-eyebrow">Kısayollar</span>
+            <h2 id="quick-links-title">Çalışma alanın</h2>
           </div>
-          <div className="profile-summary">
-            <p>Giriş yapan kullanıcı</p>
-            <h2>{user.firstName} {user.lastName}</h2>
-            <span>@{user.username}</span>
-          </div>
-          <dl className="profile-details">
-            <div><dt>E-posta</dt><dd>{user.email}</dd></div>
-            <div><dt>Hesap durumu</dt><dd>{user.isActive ? 'Aktif' : 'Pasif'}</dd></div>
-            <div><dt>Kayıt tarihi</dt><dd>{dateFormatter.format(new Date(user.createdAt))}</dd></div>
-          </dl>
+        </div>
+        <div className="quick-link-grid">
+          {quickLinks.map((item) => (
+            <Link className="quick-link-card" key={item.to} to={item.to}>
+              <span className="quick-link-icon" aria-hidden="true">
+                <i className={`pi ${item.icon}`} />
+              </span>
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
+              <i className="pi pi-arrow-right quick-link-arrow" aria-hidden="true" />
+            </Link>
+          ))}
         </div>
       </section>
-    </main>
+    </div>
   )
 }

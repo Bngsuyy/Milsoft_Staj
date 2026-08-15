@@ -1,7 +1,16 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { GuestRoute, ProtectedRoute } from '../components'
 import { AuthLayout, RootLayout } from '../layouts'
-import { DashboardPage, LoginPage, NotFoundPage, RegisterPage } from '../pages'
+import {
+  CategoriesPage,
+  DashboardPage,
+  LoginPage,
+  NotFoundPage,
+  ProfilePage,
+  RegisterPage,
+  TaskDetailPage,
+  TasksPage,
+} from '../pages'
 
 export function AppRouter() {
   return (
@@ -18,10 +27,13 @@ export function AppRouter() {
           <Route element={<RootLayout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="tasks/:id" element={<TaskDetailPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>
-
-        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   )

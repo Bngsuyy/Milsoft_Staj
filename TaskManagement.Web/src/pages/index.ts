@@ -1,4 +1,8 @@
+export { CategoriesPage } from './CategoriesPage'
 export { DashboardPage } from './DashboardPage'
 export { LoginPage } from './LoginPage'
 export { NotFoundPage } from './NotFoundPage'
+export { ProfilePage } from './ProfilePage'
 export { RegisterPage } from './RegisterPage'
+export { TaskDetailPage } from './TaskDetailPage'
+export { TasksPage } from './TasksPage'
