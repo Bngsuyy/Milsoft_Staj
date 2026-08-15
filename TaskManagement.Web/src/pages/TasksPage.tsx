@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
@@ -10,7 +10,8 @@ import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { PriorityTag, StatusTag, TaskFormDialog } from '../components'
 import { categoryService, taskService } from '../services'
-import type { Category, PagedResult, Priority, Task, TaskStatus } from '../types'
+import { TaskStatus } from '../types'
+import type { Category, PagedResult, Priority, Task } from '../types'
 import {
   formatTaskDate,
   getApiErrorMessage,
@@ -37,7 +38,14 @@ function toEndOfDay(value: string): string | undefined {
   return value ? new Date(`${value}T23:59:59.999`).toISOString() : undefined
 }
 
+function getStatusFromQuery(value: string | null): TaskStatus | null {
+  return value && Object.values(TaskStatus).includes(value as TaskStatus)
+    ? value as TaskStatus
+    : null
+}
+
 export function TasksPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const toast = useRef<Toast>(null)
   const [result, setResult] = useState<PagedResult<Task>>(emptyResult)
   const [categories, setCategories] = useState<Category[]>([])
@@ -47,12 +55,12 @@ export function TasksPage() {
   const [pageSize, setPageSize] = useState(10)
   const [searchText, setSearchText] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [status, setStatus] = useState<TaskStatus | null>(null)
+  const [status, setStatus] = useState<TaskStatus | null>(() => getStatusFromQuery(searchParams.get('status')))
   const [priority, setPriority] = useState<Priority | null>(null)
   const [categoryId, setCategoryId] = useState<string | null>(null)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [isOverdueOnly, setIsOverdueOnly] = useState(false)
+  const [isOverdueOnly, setIsOverdueOnly] = useState(() => searchParams.get('view') === 'overdue')
   const [refreshKey, setRefreshKey] = useState(0)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -212,11 +220,14 @@ export function TasksPage() {
     setStartDate('')
     setEndDate('')
     setPageNumber(1)
+    setSearchParams({}, { replace: true })
   }
 
   function toggleOverdue() {
-    setIsOverdueOnly((current) => !current)
+    const nextValue = !isOverdueOnly
+    setIsOverdueOnly(nextValue)
     resetFilters()
+    if (nextValue) setSearchParams({ view: 'overdue' }, { replace: true })
   }
 
   function handlePage(event: DataTablePageEvent) {
@@ -319,7 +330,10 @@ export function TasksPage() {
                 value={searchText}
                 placeholder="Görevlerde ara"
                 aria-label="Görevlerde ara"
-                onChange={(event) => setSearchText(event.target.value)}
+                onChange={(event) => {
+                  setSearchText(event.target.value)
+                  setSearchParams({}, { replace: true })
+                }}
               />
             </span>
             <Dropdown
@@ -331,6 +345,7 @@ export function TasksPage() {
               onChange={(event) => {
                 setCategoryId(event.value ?? null)
                 setPageNumber(1)
+                setSearchParams({}, { replace: true })
               }}
             />
             <Dropdown
@@ -340,8 +355,10 @@ export function TasksPage() {
               aria-label="Durum filtresi"
               showClear
               onChange={(event) => {
-                setStatus((event.value as TaskStatus | null) ?? null)
+                const nextStatus = (event.value as TaskStatus | null) ?? null
+                setStatus(nextStatus)
                 setPageNumber(1)
+                setSearchParams(nextStatus ? { status: nextStatus } : {}, { replace: true })
               }}
             />
             <Dropdown
@@ -353,6 +370,7 @@ export function TasksPage() {
               onChange={(event) => {
                 setPriority((event.value as Priority | null) ?? null)
                 setPageNumber(1)
+                setSearchParams({}, { replace: true })
               }}
             />
             <label className="date-filter-field">
@@ -364,6 +382,7 @@ export function TasksPage() {
                 onChange={(event) => {
                   setStartDate(event.target.value)
                   setPageNumber(1)
+                  setSearchParams({}, { replace: true })
                 }}
               />
             </label>
@@ -376,6 +395,7 @@ export function TasksPage() {
                 onChange={(event) => {
                   setEndDate(event.target.value)
                   setPageNumber(1)
+                  setSearchParams({}, { replace: true })
                 }}
               />
             </label>
