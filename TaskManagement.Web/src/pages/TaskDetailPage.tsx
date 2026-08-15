@@ -5,6 +5,9 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
 import { ProgressSpinner } from 'primereact/progressspinner'
 import { Toast } from 'primereact/toast'
 import { PriorityTag, StatusTag, TaskFormDialog } from '../components'
+import { TaskAttachmentsSection } from '../components/TaskAttachmentsSection'
+import { TaskCommentsSection } from '../components/TaskCommentsSection'
+import { useAuth } from '../hooks'
 import { categoryService, taskService } from '../services'
 import type { Category, Task } from '../types'
 import {
@@ -16,6 +19,7 @@ import {
 export function TaskDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const toast = useRef<Toast>(null)
   const [task, setTask] = useState<Task | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
@@ -105,6 +109,14 @@ export function TaskDetailPage() {
     })
   }
 
+  function showNotification(
+    severity: 'success' | 'error',
+    summary: string,
+    detail: string,
+  ) {
+    toast.current?.show({ severity, summary, detail })
+  }
+
   if (isLoading) {
     return (
       <div className="content-page task-detail-state" aria-live="polite">
@@ -189,6 +201,18 @@ export function TaskDetailPage() {
           <div><dt>Tamamlanma tarihi</dt><dd>{formatTaskDateTime(task.completedAt)}</dd></div>
         </dl>
       </article>
+
+      <div className="task-detail-workspace">
+        <TaskCommentsSection
+          taskId={task.id}
+          currentUserId={user?.id}
+          onNotify={showNotification}
+        />
+        <TaskAttachmentsSection
+          taskId={task.id}
+          onNotify={showNotification}
+        />
+      </div>
 
       {isFormOpen && (
         <TaskFormDialog

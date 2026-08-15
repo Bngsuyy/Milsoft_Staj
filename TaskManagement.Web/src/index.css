@@ -1607,6 +1607,416 @@ a.recent-task-row:hover {
   font-size: 0.8rem;
 }
 
+.task-detail-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.task-workspace-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 0.7rem 2rem rgb(15 23 42 / 5%);
+}
+
+.task-workspace-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.task-workspace-heading > div {
+  display: flex;
+  min-width: 0;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.task-workspace-heading h3,
+.task-workspace-heading p {
+  margin: 0;
+}
+
+.task-workspace-heading h3 {
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.task-workspace-heading p {
+  margin-top: 0.25rem;
+  color: #64748b;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.task-workspace-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  color: #2563eb;
+  background: #dbeafe;
+}
+
+.task-workspace-icon.attachment-heading-icon {
+  color: #7c3aed;
+  background: #ede9fe;
+}
+
+.task-workspace-count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0 0.45rem;
+  border: 1px solid #dbe3ee;
+  border-radius: 999px;
+  color: #475569;
+  background: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.comment-form {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.comment-form label {
+  color: #334155;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.comment-form .p-inputtextarea {
+  width: 100%;
+  min-height: 5.25rem;
+  border-color: #dbe3ee;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.comment-form-footer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comment-form-footer small {
+  color: #94a3b8;
+  font-size: 0.65rem;
+}
+
+.comment-list,
+.attachment-list {
+  display: grid;
+  max-height: 33rem;
+  overflow-y: auto;
+}
+
+.comment-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.comment-item:last-child,
+.attachment-item:last-child {
+  border-bottom: 0;
+}
+
+.comment-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.comment-content {
+  min-width: 0;
+}
+
+.comment-meta {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.comment-meta > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.55rem;
+  align-items: baseline;
+}
+
+.comment-meta strong {
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+}
+
+.comment-meta time {
+  color: #94a3b8;
+  font-size: 0.63rem;
+}
+
+.comment-meta .p-button,
+.attachment-actions .p-button {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+}
+
+.comment-content > p {
+  margin: 0.45rem 0 0;
+  overflow-wrap: anywhere;
+  color: #475569;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.comment-skeleton > div:last-child,
+.attachment-skeleton > div:last-child {
+  display: grid;
+  gap: 0.55rem;
+  align-content: center;
+}
+
+.workspace-inline-error {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: center;
+  margin: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #fecaca;
+  border-radius: 0.7rem;
+  color: #991b1b;
+  background: #fef2f2;
+  font-size: 0.72rem;
+}
+
+.workspace-empty-state {
+  display: flex;
+  min-height: 12rem;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.workspace-empty-state.compact {
+  min-height: 8.5rem;
+}
+
+.workspace-empty-state > i {
+  margin-bottom: 0.25rem;
+  color: #cbd5e1;
+  font-size: 1.6rem;
+}
+
+.workspace-empty-state strong {
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+.workspace-empty-state span {
+  font-size: 0.69rem;
+}
+
+.visually-hidden-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.attachment-dropzone {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: center;
+  margin: 1.25rem;
+  padding: 1rem;
+  border: 1px dashed #bfdbfe;
+  border-radius: 0.85rem;
+  background: #f8fbff;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.attachment-dropzone.is-dragging {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 0.2rem rgb(59 130 246 / 14%);
+}
+
+.attachment-dropzone > i {
+  color: #3b82f6;
+  font-size: 1.4rem;
+}
+
+.attachment-dropzone > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.attachment-dropzone strong {
+  color: #334155;
+  font-size: 0.75rem;
+}
+
+.attachment-dropzone span {
+  color: #94a3b8;
+  font-size: 0.64rem;
+}
+
+.attachment-upload-progress {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0 1.25rem 1.25rem;
+  padding: 0.8rem;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+}
+
+.attachment-upload-progress > div {
+  display: flex;
+  min-width: 0;
+  gap: 0.75rem;
+  justify-content: space-between;
+  color: #475569;
+  font-size: 0.7rem;
+}
+
+.attachment-upload-progress span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-upload-progress strong {
+  color: #2563eb;
+}
+
+.attachment-upload-progress .p-progressbar {
+  height: 0.35rem;
+  border-radius: 999px;
+  background: #dbeafe;
+}
+
+.attachment-upload-progress .p-progressbar-value {
+  background: #2563eb;
+}
+
+.attachment-list {
+  border-top: 1px solid #edf1f6;
+}
+
+.attachment-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.attachment-file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.75rem;
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.attachment-information {
+  display: grid;
+  min-width: 0;
+  gap: 0.3rem;
+}
+
+.attachment-information button {
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  color: #334155;
+  background: transparent;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.attachment-information button:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.attachment-information button:focus-visible {
+  border-radius: 0.2rem;
+  outline: 3px solid rgb(59 130 246 / 30%);
+  outline-offset: 2px;
+}
+
+.attachment-information span {
+  overflow: hidden;
+  color: #94a3b8;
+  font-size: 0.63rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-actions {
+  display: flex;
+  gap: 0.1rem;
+}
+
 @media (max-width: 1200px) {
   .task-filters {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1614,6 +2024,12 @@ a.recent-task-row:hover {
 
   .task-search-field {
     grid-column: span 2;
+  }
+}
+
+@media (max-width: 1000px) {
+  .task-detail-workspace {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1666,6 +2082,28 @@ a.recent-task-row:hover {
   .task-form-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .task-workspace-heading,
+  .comment-form,
+  .comment-item,
+  .attachment-item {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .attachment-dropzone {
+    grid-template-columns: auto minmax(0, 1fr);
+    margin: 1rem;
+  }
+
+  .attachment-dropzone .p-button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .attachment-upload-progress {
+    margin: 0 1rem 1rem;
   }
 
   .task-table-card {
