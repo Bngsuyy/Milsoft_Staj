@@ -1,5 +1,6 @@
 export { AppHeader } from './AppHeader'
 export { AppSidebar } from './AppSidebar'
+export { CategoryFormDialog } from './CategoryFormDialog'
 export { GuestRoute } from './GuestRoute'
 export { LoadingScreen } from './LoadingScreen'
 export { ProtectedRoute } from './ProtectedRoute'

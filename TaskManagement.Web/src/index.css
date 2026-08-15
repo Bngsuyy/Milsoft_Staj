@@ -398,6 +398,243 @@ a {
   }
 }
 
+/* Kategori yönetimi */
+.categories-page .p-button,
+.category-form-dialog .p-button {
+  font-size: 0.82rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.category-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 15rem;
+  overflow: hidden;
+  flex-direction: column;
+  padding: 1.15rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 0.55rem 1.8rem rgb(15 23 42 / 4%);
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.category-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 0.9rem 2rem rgb(15 23 42 / 7%);
+  transform: translateY(-2px);
+}
+
+.category-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.category-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.8rem;
+  background: #f1f5f9;
+  font-size: 1.1rem;
+}
+
+.category-card-actions {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.category-card-actions .p-button {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+.category-card-content {
+  margin-top: 1.25rem;
+}
+
+.category-name-row {
+  display: flex;
+  min-width: 0;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.category-name-row h3 {
+  margin: 0;
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-card-content p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0.65rem 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.category-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  color: #94a3b8;
+  font-size: 0.66rem;
+}
+
+.category-card-footer span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+}
+
+.category-skeleton {
+  gap: 1rem;
+  pointer-events: none;
+}
+
+.category-skeleton:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 0.55rem 1.8rem rgb(15 23 42 / 4%);
+  transform: none;
+}
+
+.category-empty-state .p-button {
+  margin-top: 1.25rem;
+}
+
+.category-form-dialog .p-dialog-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.category-form-dialog .p-dialog-title {
+  color: #0f172a;
+  font-size: 1.1rem;
+}
+
+.category-form-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.category-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.category-color-field {
+  min-width: 0;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.8rem;
+}
+
+.category-color-field legend {
+  padding: 0 0.35rem;
+  color: #334155;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.category-color-control {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.category-color-control .p-colorpicker-preview,
+.category-color-preview {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+}
+
+.category-color-control .p-inputtext {
+  width: 100%;
+  min-height: 2.75rem;
+  border-radius: 0.7rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.category-color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+.category-color-presets button {
+  width: 1.85rem;
+  height: 1.85rem;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  outline: 1px solid #cbd5e1;
+  cursor: pointer;
+  transition: transform 150ms ease, outline-color 150ms ease;
+}
+
+.category-color-presets button:hover,
+.category-color-presets button.is-selected {
+  outline: 2px solid #2563eb;
+  transform: scale(1.08);
+}
+
+.category-color-presets button:focus-visible {
+  outline: 3px solid rgb(59 130 246 / 45%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 980px) {
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-card {
+    min-height: 13.5rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .category-color-control {
+    grid-template-columns: auto auto;
+  }
+
+  .category-color-control .p-inputtext {
+    grid-column: 1 / -1;
+  }
+}
+
 /* Görev yönetimi */
 .tasks-page .p-button,
 .task-detail-page .p-button,
