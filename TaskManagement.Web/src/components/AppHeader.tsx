@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks'
+import { ThemeToggleButton } from './ThemeToggleButton'
 
 interface AppHeaderProps {
   onMenuOpen: () => void
@@ -71,43 +72,46 @@ export function AppHeader({ onMenuOpen }: AppHeaderProps) {
         </div>
       </div>
 
-      <div className="user-menu" ref={menuRef}>
-        <button
-          className="user-menu-trigger"
-          type="button"
-          aria-expanded={isUserMenuOpen}
-          aria-haspopup="menu"
-          onClick={() => setIsUserMenuOpen((current) => !current)}
-        >
-          <span className="header-avatar" aria-hidden="true">{initials.toLocaleUpperCase('tr-TR')}</span>
-          <span className="user-menu-name">
-            <strong>{user?.firstName} {user?.lastName}</strong>
-            <small>@{user?.username}</small>
-          </span>
-          <i className={`pi ${isUserMenuOpen ? 'pi-chevron-up' : 'pi-chevron-down'}`} aria-hidden="true" />
-        </button>
-
-        {isUserMenuOpen && (
-          <div className="user-menu-panel" role="menu">
-            <div className="user-menu-summary">
+      <div className="header-actions">
+        <ThemeToggleButton />
+        <div className="user-menu" ref={menuRef}>
+          <button
+            className="user-menu-trigger"
+            type="button"
+            aria-expanded={isUserMenuOpen}
+            aria-haspopup="menu"
+            onClick={() => setIsUserMenuOpen((current) => !current)}
+          >
+            <span className="header-avatar" aria-hidden="true">{initials.toLocaleUpperCase('tr-TR')}</span>
+            <span className="user-menu-name">
               <strong>{user?.firstName} {user?.lastName}</strong>
-              <span>{user?.email}</span>
+              <small>@{user?.username}</small>
+            </span>
+            <i className={`pi ${isUserMenuOpen ? 'pi-chevron-up' : 'pi-chevron-down'}`} aria-hidden="true" />
+          </button>
+
+          {isUserMenuOpen && (
+            <div className="user-menu-panel" role="menu">
+              <div className="user-menu-summary">
+                <strong>{user?.firstName} {user?.lastName}</strong>
+                <span>{user?.email}</span>
+              </div>
+              <Link
+                className="user-menu-item"
+                role="menuitem"
+                to="/profile"
+                onClick={() => setIsUserMenuOpen(false)}
+              >
+                <i className="pi pi-user" aria-hidden="true" />
+                Profilim
+              </Link>
+              <button className="user-menu-item danger" role="menuitem" type="button" onClick={handleLogout}>
+                <i className="pi pi-sign-out" aria-hidden="true" />
+                Çıkış yap
+              </button>
             </div>
-            <Link
-              className="user-menu-item"
-              role="menuitem"
-              to="/profile"
-              onClick={() => setIsUserMenuOpen(false)}
-            >
-              <i className="pi pi-user" aria-hidden="true" />
-              Profilim
-            </Link>
-            <button className="user-menu-item danger" role="menuitem" type="button" onClick={handleLogout}>
-              <i className="pi pi-sign-out" aria-hidden="true" />
-              Çıkış yap
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </header>
   )

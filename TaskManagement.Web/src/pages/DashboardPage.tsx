@@ -6,9 +6,10 @@ import { Button } from 'primereact/button'
 import { Skeleton } from 'primereact/skeleton'
 import { Doughnut } from 'react-chartjs-2'
 import { PriorityTag, StatusTag } from '../components'
-import { useAuth } from '../hooks'
+import { useAuth, useTheme } from '../hooks'
 import { taskService } from '../services'
 import { TaskStatus } from '../types'
+import type { AppTheme } from '../contexts'
 import type { Task, TaskStatistics } from '../types'
 import { formatTaskDate, getApiErrorMessage, isTaskOverdue } from '../utils'
 
@@ -23,30 +24,34 @@ const emptyStatistics: TaskStatistics = {
   overdue: 0,
 }
 
-const chartOptions: ChartOptions<'doughnut'> = {
-  responsive: true,
-  maintainAspectRatio: false,
-  cutout: '68%',
-  plugins: {
-    legend: {
-      position: 'bottom',
-      labels: {
-        boxWidth: 10,
-        boxHeight: 10,
-        padding: 18,
-        usePointStyle: true,
-        font: { size: 11 },
+function getChartOptions(theme: AppTheme): ChartOptions<'doughnut'> {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '68%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: theme === 'dark' ? '#CBD5E1' : '#475569',
+          boxWidth: 10,
+          boxHeight: 10,
+          padding: 18,
+          usePointStyle: true,
+          font: { size: 11 },
+        },
+      },
+      tooltip: {
+        backgroundColor: theme === 'dark' ? '#020617' : '#0F172A',
+        callbacks: {
+          label: (context) => ` ${context.label}: ${context.formattedValue} görev`,
+        },
       },
     },
-    tooltip: {
-      callbacks: {
-        label: (context) => ` ${context.label}: ${context.formattedValue} görev`,
-      },
-    },
-  },
+  }
 }
 
-function getChartData(statistics: TaskStatistics): ChartData<'doughnut'> {
+function getChartData(statistics: TaskStatistics, theme: AppTheme): ChartData<'doughnut'> {
   return {
     labels: ['Bekleyen', 'Devam eden', 'Tamamlanan', 'İptal edilen'],
     datasets: [
@@ -58,7 +63,7 @@ function getChartData(statistics: TaskStatistics): ChartData<'doughnut'> {
           statistics.cancelled,
         ],
         backgroundColor: ['#F59E0B', '#3B82F6', '#10B981', '#94A3B8'],
-        borderColor: '#FFFFFF',
+        borderColor: theme === 'dark' ? '#111C2F' : '#FFFFFF',
         borderWidth: 4,
         hoverOffset: 5,
       },
@@ -68,6 +73,7 @@ function getChartData(statistics: TaskStatistics): ChartData<'doughnut'> {
 
 export function DashboardPage() {
   const { user } = useAuth()
+  const { theme } = useTheme()
   const [statistics, setStatistics] = useState<TaskStatistics>(emptyStatistics)
   const [recentTasks, setRecentTasks] = useState<Task[]>([])
   const [overdueTasks, setOverdueTasks] = useState<Task[]>([])
@@ -169,8 +175,8 @@ export function DashboardPage() {
               <Skeleton shape="circle" size="13rem" />
             ) : chartHasData ? (
               <Doughnut
-                data={getChartData(statistics)}
-                options={chartOptions}
+                data={getChartData(statistics, theme)}
+                options={getChartOptions(theme)}
                 role="img"
                 aria-label={`Bekleyen ${statistics.pending}, devam eden ${statistics.inProgress}, tamamlanan ${statistics.completed}, iptal edilen ${statistics.cancelled} görev`}
               />

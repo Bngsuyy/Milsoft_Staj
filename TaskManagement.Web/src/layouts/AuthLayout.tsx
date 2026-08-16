@@ -1,8 +1,10 @@
 import { Outlet } from 'react-router-dom'
+import { ThemeToggleButton } from '../components'
 
 export function AuthLayout() {
   return (
     <main className="auth-page">
+      <ThemeToggleButton className="auth-theme-toggle" />
       <div className="auth-shell">
         <section className="auth-brand" aria-label="Uygulama tanıtımı">
           <div className="auth-brand-content">
