@@ -51,9 +51,11 @@ Giriş gövdesi:
 | GET | `/Tasks/{id}` | Tek görevi döndürür. |
 | POST | `/Tasks` | Görev oluşturur. |
 | PUT | `/Tasks/{id}` | Görevi günceller. |
-| DELETE | `/Tasks/{id}` | Görevi ve bağlı yorum/dosya kayıtlarını siler. |
+| DELETE | `/Tasks/{id}` | Görevi, bağlı yorum/dosya kayıtlarını ve diskteki dosyaları siler. |
 | GET | `/Tasks/overdue` | Tamamlanmamış ve vadesi geçmiş görevleri döndürür. |
 | GET | `/Tasks/statistics` | Durum ve gecikme sayılarını döndürür. |
+| POST | `/Tasks/bulk/status` | Seçili görevlerin durumunu topluca günceller. |
+| POST | `/Tasks/bulk/delete` | Seçili görevleri topluca siler. |
 
 Liste sorgu parametreleri: `searchTerm`, `status`, `priority`, `categoryId`, `startDate`, `endDate`, `pageNumber`, `pageSize`. `pageSize` en fazla 50'dir.
 
@@ -68,6 +70,24 @@ Görev oluşturma örneği:
   "categoryId": null
 }
 ```
+
+Toplu işlem gövdeleri (tek istekte en fazla 200 görev):
+
+```json
+{
+  "taskIds": ["b0f1...", "c2a4..."],
+  "status": "Completed"
+}
+```
+
+```json
+{
+  "taskIds": ["b0f1..."]
+}
+```
+
+Her iki uç da `{ "affectedCount": 2 }` biçiminde yanıt döner ve yalnızca isteği yapan
+kullanıcıya ait görevleri etkiler.
 
 ## Kategoriler
 
@@ -95,6 +115,8 @@ Görev oluşturma örneği:
 | POST | `/Tasks/{taskId}/attachments` | `multipart/form-data` içindeki `file` alanını yükler. |
 | GET | `/Tasks/{taskId}/attachments/{attachmentId}/download` | Dosyayı indirir. |
 | DELETE | `/Tasks/{taskId}/attachments/{attachmentId}` | Dosya kaydını ve fiziksel dosyayı siler. |
+
+Kategori `color` alanı 6 haneli HEX biçiminde olmalıdır (ör. `#2563EB`).
 
 Dosya sınırı varsayılan olarak 10 MB'dir ve `FileUpload:MaxFileSizeBytes` ile değiştirilebilir.
 

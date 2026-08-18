@@ -17,7 +17,13 @@
 - Task -> TaskComments: one-to-many, cascade delete.
 - Task -> TaskAttachments: one-to-many, cascade delete.
 
-`Priority` için 1-5, `Status` için 0-3 check constraint'leri vardır. Görev sorguları için `(UserId, Status)` ve `(UserId, DueDate)` indeksleri kullanılır.
+`Priority` için 1-5, `Status` için 0-3 check constraint'leri vardır ve `Priority` varsayılanı
+`1` (Low)'dur. Görev sorguları için `(UserId, Status)` ve `(UserId, DueDate)` indeksleri kullanılır.
+Kategori `Color` alanı temiz kurulum scriptlerinde 6 haneli HEX biçimiyle sınırlandırılmıştır;
+API doğrulaması da aynı kuralı uygular.
+
+Bir görev silindiğinde `TaskComments` ve `TaskAttachments` satırları cascade ile silinir;
+`TaskAttachments` kayıtlarına ait fiziksel dosyalar da servis katmanında diskten kaldırılır.
 
 ## PostgreSQL
 

@@ -3199,3 +3199,319 @@ a.recent-task-row:hover {
     padding: 1.25rem;
   }
 }
+
+/* ==========================================================================
+   Footer, pano görünümü, toplu işlemler, satır içi düzenleme ve kısayollar
+   ========================================================================== */
+
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  border-top: 1px solid rgb(203 213 225 / 70%);
+  background: rgb(255 255 255 / 70%);
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.app-footer kbd {
+  padding: 0.05rem 0.35rem;
+  border: 1px solid rgb(148 163 184 / 60%);
+  border-radius: 0.35rem;
+  background: rgb(241 245 249 / 90%);
+  font-family: inherit;
+  font-size: 0.72rem;
+}
+
+[data-theme="dark"] .app-footer {
+  border-top-color: rgb(51 65 85 / 80%);
+  background: rgb(15 23 42 / 60%);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .app-footer kbd {
+  border-color: rgb(71 85 105 / 80%);
+  background: rgb(30 41 59 / 90%);
+}
+
+.page-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.task-view-divider {
+  width: 1px;
+  height: 1.6rem;
+  background: rgb(148 163 184 / 45%);
+}
+
+/* --- Toplu işlem çubuğu --- */
+
+.bulk-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid rgb(37 99 235 / 35%);
+  border-radius: 0.9rem;
+  background: rgb(37 99 235 / 8%);
+}
+
+.bulk-actions-count {
+  margin-right: auto;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1d4ed8;
+}
+
+[data-theme="dark"] .bulk-actions-bar {
+  border-color: rgb(59 130 246 / 45%);
+  background: rgb(30 58 138 / 25%);
+}
+
+[data-theme="dark"] .bulk-actions-count {
+  color: #93c5fd;
+}
+
+/* --- Satır içi düzenleme --- */
+
+.inline-editor-input {
+  width: 100%;
+}
+
+.p-datatable .p-cell-editing {
+  padding: 0.35rem 0.5rem;
+}
+
+/* --- Kanban pano görünümü --- */
+
+.task-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.task-board-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 16rem;
+  padding: 0.85rem;
+  border: 1px solid rgb(203 213 225 / 80%);
+  border-radius: 1rem;
+  background: rgb(248 250 252 / 90%);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.task-board-column.is-drop-target {
+  border-color: #2563eb;
+  background: rgb(37 99 235 / 10%);
+}
+
+.task-board-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid rgb(148 163 184 / 45%);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.task-board-heading.status-pending { border-bottom-color: #f59e0b; }
+.task-board-heading.status-inprogress { border-bottom-color: #3b82f6; }
+.task-board-heading.status-completed { border-bottom-color: #10b981; }
+.task-board-heading.status-cancelled { border-bottom-color: #94a3b8; }
+
+.task-board-heading strong {
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: rgb(148 163 184 / 25%);
+  font-size: 0.78rem;
+}
+
+.task-board-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.task-board-hint {
+  margin: 0;
+  padding: 1.25rem 0.5rem;
+  border: 1px dashed rgb(148 163 184 / 60%);
+  border-radius: 0.75rem;
+  color: #94a3b8;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.task-board-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid rgb(203 213 225 / 90%);
+  border-radius: 0.8rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+  cursor: grab;
+}
+
+.task-board-card:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.task-board-card.is-dragging {
+  opacity: 0.45;
+}
+
+.task-board-card.is-overdue {
+  border-left: 3px solid #dc2626;
+}
+
+.task-board-card > a {
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+
+.task-board-card > a:hover {
+  text-decoration: underline;
+}
+
+.task-board-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.task-board-card footer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.task-board-card footer small {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .task-board-column {
+  border-color: rgb(51 65 85 / 90%);
+  background: rgb(15 23 42 / 55%);
+}
+
+[data-theme="dark"] .task-board-card {
+  border-color: rgb(51 65 85 / 90%);
+  background: #111c2f;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .task-board-hint {
+  border-color: rgb(71 85 105 / 70%);
+  color: #64748b;
+}
+
+@media (max-width: 1200px) {
+  .task-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .task-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-footer {
+    padding: 1rem 1.25rem;
+  }
+}
+
+/* --- Kısayol yardımı --- */
+
+.shortcut-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shortcut-list li {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgb(203 213 225 / 60%);
+  font-size: 0.88rem;
+}
+
+.shortcut-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.shortcut-keys {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.shortcut-keys kbd {
+  min-width: 1.6rem;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid rgb(148 163 184 / 60%);
+  border-bottom-width: 2px;
+  border-radius: 0.4rem;
+  background: rgb(241 245 249 / 90%);
+  text-align: center;
+  font-family: inherit;
+  font-size: 0.78rem;
+}
+
+[data-theme="dark"] .shortcut-list li {
+  border-bottom-color: rgb(51 65 85 / 80%);
+}
+
+[data-theme="dark"] .shortcut-keys kbd {
+  border-color: rgb(71 85 105 / 80%);
+  background: rgb(30 41 59 / 90%);
+}
+
+/* --- Profil düzenleme formu --- */
+
+.profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.profile-form .full-width-field {
+  grid-column: 1 / -1;
+}
+
+.field-error {
+  color: #dc2626;
+}
+
+@media (max-width: 640px) {
+  .profile-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

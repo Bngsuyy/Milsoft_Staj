@@ -22,7 +22,7 @@ namespace TaskManagement.API.DTOs
         [StringLength(500, ErrorMessage = "Açıklama en fazla 500 karakter olabilir.")]
         public string? Description { get; set; }
 
-        [RegularExpression("^#(?:[0-9a-fA-F]{3}){1,2}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz (ör: #FF5733).")]
+        [RegularExpression("^#[0-9a-fA-F]{6}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz (ör: #FF5733).")]
         public string Color { get; set; } = "#007bff";
     }
 
@@ -36,7 +36,7 @@ namespace TaskManagement.API.DTOs
         [StringLength(500, ErrorMessage = "Açıklama en fazla 500 karakter olabilir.")]
         public string? Description { get; set; }
 
-        [RegularExpression("^#(?:[0-9a-fA-F]{3}){1,2}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz.")]
+        [RegularExpression("^#[0-9a-fA-F]{6}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz.")]
         public string Color { get; set; } = "#007bff";
     }
 }

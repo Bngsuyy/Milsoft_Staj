@@ -1,11 +1,14 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs;
 using TaskManagement.API.Entities;
 using TaskManagement.API.Enums;
+using TaskManagement.API.Models;
 using TaskManagement.API.Services;
+using TaskManagement.API.Services.Interfaces;
 using Xunit;
 
 namespace TaskManagement.API.Tests
@@ -32,7 +35,7 @@ namespace TaskManagement.API.Tests
                 CreateTask("Başkasının görevi", other.Id));
             await context.SaveChangesAsync();
 
-            var service = new TaskService(context, _mapper);
+            var service = CreateService(context);
             var result = await service.GetAllTasksAsync(owner.Id, new TaskFilterDto());
 
             Assert.Single(result.Items);
@@ -50,7 +53,7 @@ namespace TaskManagement.API.Tests
             context.Categories.Add(category);
             await context.SaveChangesAsync();
 
-            var service = new TaskService(context, _mapper);
+            var service = CreateService(context);
             var request = new CreateTaskDto { Title = "Görev", CategoryId = category.Id };
 
             await Assert.ThrowsAsync<InvalidOperationException>(
@@ -67,7 +70,7 @@ namespace TaskManagement.API.Tests
             context.Tasks.Add(task);
             await context.SaveChangesAsync();
 
-            var service = new TaskService(context, _mapper);
+            var service = CreateService(context);
             var result = await service.UpdateTaskAsync(task.Id, new UpdateTaskDto
             {
                 Title = task.Title,
@@ -92,12 +95,68 @@ namespace TaskManagement.API.Tests
                 CreateTask("Tamamlandı", owner.Id, DateTime.UtcNow.AddDays(-2), Status.Completed));
             await context.SaveChangesAsync();
 
-            var service = new TaskService(context, _mapper);
+            var service = CreateService(context);
             var statistics = await service.GetStatisticsAsync(owner.Id);
 
             Assert.Equal(3, statistics.Total);
             Assert.Equal(1, statistics.Overdue);
             Assert.Equal(1, statistics.Completed);
+        }
+
+        [Fact]
+        public async Task BulkUpdateStatus_OnlyTouchesAuthenticatedUsersTasks()
+        {
+            await using var context = CreateContext();
+            var owner = CreateUser("owner");
+            var other = CreateUser("other");
+            var ownedTask = CreateTask("Benim görevim", owner.Id);
+            var foreignTask = CreateTask("Başkasının görevi", other.Id);
+            context.Users.AddRange(owner, other);
+            context.Tasks.AddRange(ownedTask, foreignTask);
+            await context.SaveChangesAsync();
+
+            var service = CreateService(context);
+            var affectedCount = await service.BulkUpdateStatusAsync(owner.Id, new BulkTaskStatusDto
+            {
+                TaskIds = new List<Guid> { ownedTask.Id, foreignTask.Id },
+                Status = Status.Completed
+            });
+
+            Assert.Equal(1, affectedCount);
+            Assert.Equal(Status.Completed, (await context.Tasks.FindAsync(ownedTask.Id))!.Status);
+            Assert.NotNull((await context.Tasks.FindAsync(ownedTask.Id))!.CompletedAt);
+            Assert.Equal(Status.Pending, (await context.Tasks.FindAsync(foreignTask.Id))!.Status);
+        }
+
+        [Fact]
+        public async Task BulkDelete_RemovesOnlySelectedOwnedTasks()
+        {
+            await using var context = CreateContext();
+            var owner = CreateUser("owner");
+            var removedTask = CreateTask("Silinecek", owner.Id);
+            var keptTask = CreateTask("Kalacak", owner.Id);
+            context.Users.Add(owner);
+            context.Tasks.AddRange(removedTask, keptTask);
+            await context.SaveChangesAsync();
+
+            var service = CreateService(context);
+            var affectedCount = await service.BulkDeleteAsync(owner.Id, new BulkTaskDeleteDto
+            {
+                TaskIds = new List<Guid> { removedTask.Id }
+            });
+
+            Assert.Equal(1, affectedCount);
+            Assert.Null(await context.Tasks.FindAsync(removedTask.Id));
+            Assert.NotNull(await context.Tasks.FindAsync(keptTask.Id));
+        }
+
+        private static TaskService CreateService(ApplicationDbContext context)
+        {
+            return new TaskService(
+                context,
+                new MapperConfiguration(configuration =>
+                    configuration.AddProfile<MappingProfile>()).CreateMapper(),
+                new NoopAttachmentService());
         }
 
         private static ApplicationDbContext CreateContext()
@@ -135,6 +194,26 @@ namespace TaskManagement.API.Tests
                 DueDate = dueDate,
                 CompletedAt = status == Status.Completed ? DateTime.UtcNow : null
             };
+        }
+
+        // Birim testlerinde diske erisilmemesi icin bos implementasyon kullanilir.
+        private sealed class NoopAttachmentService : ITaskAttachmentService
+        {
+            public Task<List<TaskAttachmentDto>> GetAllAsync(Guid taskId, Guid userId) =>
+                Task.FromResult(new List<TaskAttachmentDto>());
+
+            public Task<TaskAttachmentDto> UploadAsync(Guid taskId, Guid userId, IFormFile file) =>
+                throw new NotSupportedException();
+
+            public Task<TaskAttachmentFile> GetFileAsync(Guid taskId, Guid attachmentId, Guid userId) =>
+                throw new NotSupportedException();
+
+            public Task<bool> DeleteAsync(Guid taskId, Guid attachmentId, Guid userId) =>
+                Task.FromResult(false);
+
+            public void RemoveTaskFiles(Guid userId, Guid taskId)
+            {
+            }
         }
     }
 }

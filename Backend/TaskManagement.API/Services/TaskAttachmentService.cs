@@ -138,6 +138,14 @@ namespace TaskManagement.API.Services
             return true;
         }
 
+        // Görev silindiğinde attachment satırları cascade ile gider; disk klasörü burada temizlenir.
+        public void RemoveTaskFiles(Guid userId, Guid taskId)
+        {
+            var directory = Path.Combine(_storageRoot, userId.ToString("N"), taskId.ToString("N"));
+            if (Directory.Exists(directory))
+                Directory.Delete(directory, recursive: true);
+        }
+
         private async Task<TaskAttachment> GetOwnedAttachmentAsync(
             Guid taskId,
             Guid attachmentId,

@@ -30,7 +30,7 @@ CREATE TABLE "Tasks" (
     "Id" RAW(16) PRIMARY KEY,
     "Title" VARCHAR2(200 CHAR) NOT NULL,
     "Description" VARCHAR2(2000 CHAR),
-    "Priority" NUMBER(10) DEFAULT 2 NOT NULL,
+    "Priority" NUMBER(10) DEFAULT 1 NOT NULL,
     "Status" NUMBER(10) DEFAULT 0 NOT NULL,
     "DueDate" TIMESTAMP(7),
     "CompletedAt" TIMESTAMP(7),

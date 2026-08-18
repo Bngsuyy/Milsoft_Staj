@@ -31,7 +31,7 @@ CREATE TABLE "Tasks" (
     "Id" uuid PRIMARY KEY,
     "Title" varchar(200) NOT NULL,
     "Description" varchar(2000),
-    "Priority" integer NOT NULL DEFAULT 2,
+    "Priority" integer NOT NULL DEFAULT 1,
     "Status" integer NOT NULL DEFAULT 0,
     "DueDate" timestamptz,
     "CompletedAt" timestamptz,

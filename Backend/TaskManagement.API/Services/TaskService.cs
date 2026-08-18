@@ -13,11 +13,16 @@ namespace TaskManagement.API.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITaskAttachmentService _attachmentService;
 
-        public TaskService(ApplicationDbContext context, IMapper mapper)
+        public TaskService(
+            ApplicationDbContext context,
+            IMapper mapper,
+            ITaskAttachmentService attachmentService)
         {
             _context = context;
             _mapper = mapper;
+            _attachmentService = attachmentService;
         }
 
         public async Task<PagedResult<TaskItemDto>> GetAllTasksAsync(Guid userId, TaskFilterDto filterDto)
@@ -32,7 +37,7 @@ namespace TaskManagement.API.Services
             // 2. Dinamik Filtreleme
             if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
             {
-                var search = filterDto.SearchTerm.Trim().ToLower();
+                var search = filterDto.SearchTerm.Trim().ToLowerInvariant();
                 query = query.Where(t => t.Title.ToLower().Contains(search) || 
                                          (t.Description != null && t.Description.ToLower().Contains(search)));
             }
@@ -165,6 +170,9 @@ namespace TaskManagement.API.Services
 
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
+
+            // Ek kayitlari cascade ile silinir; diskteki dosyalar burada temizlenir.
+            _attachmentService.RemoveTaskFiles(userId, task.Id);
             return true;
         }
 
@@ -219,6 +227,52 @@ namespace TaskManagement.API.Services
                     && task.Status != Status.Completed
                     && task.Status != Status.Cancelled)
             };
+        }
+
+        public async Task<int> BulkUpdateStatusAsync(Guid userId, BulkTaskStatusDto bulkStatusDto)
+        {
+            var taskIds = bulkStatusDto.TaskIds.Distinct().ToList();
+            var tasks = await _context.Tasks
+                .Where(task => task.UserId == userId && taskIds.Contains(task.Id))
+                .ToListAsync();
+
+            if (tasks.Count == 0)
+                throw new KeyNotFoundException("Seçilen görevler bulunamadı veya erişim yetkiniz yok.");
+
+            var now = DateTime.UtcNow;
+            foreach (var task in tasks)
+            {
+                // Tekil güncellemeyle aynı tamamlanma tarihi kuralı uygulanır.
+                if (bulkStatusDto.Status == Status.Completed && task.Status != Status.Completed)
+                    task.CompletedAt = now;
+                else if (bulkStatusDto.Status != Status.Completed)
+                    task.CompletedAt = null;
+
+                task.Status = bulkStatusDto.Status;
+                task.UpdatedAt = now;
+            }
+
+            await _context.SaveChangesAsync();
+            return tasks.Count;
+        }
+
+        public async Task<int> BulkDeleteAsync(Guid userId, BulkTaskDeleteDto bulkDeleteDto)
+        {
+            var taskIds = bulkDeleteDto.TaskIds.Distinct().ToList();
+            var tasks = await _context.Tasks
+                .Where(task => task.UserId == userId && taskIds.Contains(task.Id))
+                .ToListAsync();
+
+            if (tasks.Count == 0)
+                throw new KeyNotFoundException("Silinecek görev bulunamadı veya erişim yetkiniz yok.");
+
+            _context.Tasks.RemoveRange(tasks);
+            await _context.SaveChangesAsync();
+
+            foreach (var task in tasks)
+                _attachmentService.RemoveTaskFiles(userId, task.Id);
+
+            return tasks.Count;
         }
 
         private static DateTime? EnsureUtc(DateTime? value)

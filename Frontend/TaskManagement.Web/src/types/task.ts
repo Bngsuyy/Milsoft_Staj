@@ -51,3 +51,16 @@ export interface TaskStatistics {
   cancelled: number
   overdue: number
 }
+
+export interface BulkTaskStatusRequest {
+  taskIds: EntityId[]
+  status: TaskStatus
+}
+
+export interface BulkTaskDeleteRequest {
+  taskIds: EntityId[]
+}
+
+export interface BulkOperationResult {
+  affectedCount: number
+}

@@ -86,6 +86,49 @@ describe('API servis entegrasyonu', () => {
     await expect(commentService.delete(task.id, comment.id)).resolves.toBeUndefined()
   })
 
+  it('toplu işlem uçlarına seçilen görev kimliklerini gönderir', async () => {
+    mock.onPost('/Tasks/bulk/status').reply((config) => {
+      expect(JSON.parse(config.data as string)).toEqual({
+        taskIds: ['task-1', 'task-2'],
+        status: TaskStatus.Completed,
+      })
+      return [200, { affectedCount: 2 }]
+    })
+    mock.onPost('/Tasks/bulk/delete').reply((config) => {
+      expect(JSON.parse(config.data as string)).toEqual({ taskIds: ['task-1'] })
+      return [200, { affectedCount: 1 }]
+    })
+
+    await expect(taskService.bulkUpdateStatus({
+      taskIds: ['task-1', 'task-2'],
+      status: TaskStatus.Completed,
+    })).resolves.toEqual({ affectedCount: 2 })
+
+    await expect(taskService.bulkDelete({ taskIds: ['task-1'] }))
+      .resolves.toEqual({ affectedCount: 1 })
+  })
+
+  it('dışa aktarma için tüm sayfaları sırayla toplar', async () => {
+    const secondTask: Task = { ...task, id: 'task-2', title: 'İkinci görev' }
+
+    mock.onGet('/Tasks').reply((config) => {
+      const pageNumber = Number(config.params.pageNumber)
+      return [200, {
+        items: pageNumber === 1 ? [task] : [secondTask],
+        totalCount: 2,
+        pageNumber,
+        pageSize: 50,
+        totalPages: 2,
+        hasPreviousPage: pageNumber > 1,
+        hasNextPage: pageNumber < 2,
+      } satisfies PagedResult<Task>]
+    })
+
+    const collected = await taskService.getAllMatching({ searchTerm: 'görev' })
+
+    expect(collected.map((item) => item.id)).toEqual(['task-1', 'task-2'])
+  })
+
   it('dosya yükleme, indirme ve silme isteklerini doğru gönderir', async () => {
     const file = new File(['test içeriği'], 'test.txt', { type: 'text/plain' })
     const attachment = {

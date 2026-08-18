@@ -72,6 +72,33 @@ namespace TaskManagement.API.DTOs
         public int PageSize { get; set; } = 10;
     }
 
+    // Toplu Durum Guncelleme DTO'su (Bulk Operations)
+    public class BulkTaskStatusDto
+    {
+        [Required(ErrorMessage = "En az bir görev seçilmelidir.")]
+        [MinLength(1, ErrorMessage = "En az bir görev seçilmelidir.")]
+        [MaxLength(200, ErrorMessage = "Tek seferde en fazla 200 görev güncellenebilir.")]
+        public List<Guid> TaskIds { get; set; } = new();
+
+        [EnumDataType(typeof(Status), ErrorMessage = "Geçersiz görev durumu.")]
+        public Status Status { get; set; }
+    }
+
+    // Toplu Silme DTO'su (Bulk Operations)
+    public class BulkTaskDeleteDto
+    {
+        [Required(ErrorMessage = "En az bir görev seçilmelidir.")]
+        [MinLength(1, ErrorMessage = "En az bir görev seçilmelidir.")]
+        [MaxLength(200, ErrorMessage = "Tek seferde en fazla 200 görev silinebilir.")]
+        public List<Guid> TaskIds { get; set; } = new();
+    }
+
+    // Toplu islem sonucu
+    public class BulkOperationResultDto
+    {
+        public int AffectedCount { get; set; }
+    }
+
     public class TaskStatisticsDto
     {
         public int Total { get; set; }

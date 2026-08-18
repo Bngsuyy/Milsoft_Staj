@@ -74,6 +74,20 @@ namespace TaskManagement.API.Controllers
             return Ok(updatedTask);
         }
 
+        [HttpPost("bulk/status")]
+        public async Task<IActionResult> BulkUpdateStatus([FromBody] BulkTaskStatusDto bulkStatusDto)
+        {
+            var affectedCount = await _taskService.BulkUpdateStatusAsync(GetUserId(), bulkStatusDto);
+            return Ok(new BulkOperationResultDto { AffectedCount = affectedCount });
+        }
+
+        [HttpPost("bulk/delete")]
+        public async Task<IActionResult> BulkDelete([FromBody] BulkTaskDeleteDto bulkDeleteDto)
+        {
+            var affectedCount = await _taskService.BulkDeleteAsync(GetUserId(), bulkDeleteDto);
+            return Ok(new BulkOperationResultDto { AffectedCount = affectedCount });
+        }
+
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
