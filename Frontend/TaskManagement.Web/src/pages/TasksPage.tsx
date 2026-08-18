@@ -8,6 +8,7 @@ import { DataTable } from 'primereact/datatable'
 import type { DataTablePageEvent } from 'primereact/datatable'
 import { Dropdown } from 'primereact/dropdown'
 import { InputText } from 'primereact/inputtext'
+import { Paginator } from 'primereact/paginator'
 import { SplitButton } from 'primereact/splitbutton'
 import { Toast } from 'primereact/toast'
 import {
@@ -348,9 +349,11 @@ export function TasksPage() {
     async (mode: 'excel' | 'pdf' | 'print') => {
       setIsExporting(true)
       try {
-        const tasks = selectedTasks.length > 0
-          ? selectedTasks
+        const collected = selectedTasks.length > 0
+          ? { items: selectedTasks, isTruncated: false, totalCount: selectedTasks.length, limit: selectedTasks.length }
           : await taskService.getAllMatching(filter, isOverdueOnly)
+
+        const tasks = collected.items
 
         if (tasks.length === 0) {
           notify('warn', 'Dışa aktarılacak görev yok', 'Filtrelerle eşleşen görev bulunamadı.')
@@ -361,7 +364,14 @@ export function TasksPage() {
         else if (mode === 'pdf') await exportTasksToPdf(tasks)
         else printTasks(tasks, isOverdueOnly ? 'Vadesi geçen görevler' : 'Görevler')
 
-        if (mode !== 'print') {
+        // Üst sınır aşıldıysa eksik çıktı sessizce bırakılmaz.
+        if (collected.isTruncated) {
+          notify(
+            'warn',
+            'Çıktı ilk ' + collected.limit + ' görevle sınırlandı',
+            `Filtreye ${collected.totalCount} görev uyuyor. Tamamını almak için filtreleri daraltın veya listeden seçim yapın.`,
+          )
+        } else if (mode !== 'print') {
           notify('success', 'Dışa aktarma tamamlandı', `${tasks.length} görev aktarıldı.`)
         }
       } catch (error) {
@@ -667,12 +677,31 @@ export function TasksPage() {
       )}
 
       {view === 'board' ? (
-        <TaskBoard
-          tasks={result.items}
-          isLoading={isLoading}
-          onEdit={openEditDialog}
-          onStatusChange={(task, nextStatus) => applyTaskChange(task, { status: nextStatus })}
-        />
+        <>
+          {result.totalCount > effectivePageSize && (
+            <p className="board-scope-note" role="status">
+              <i className="pi pi-info-circle" aria-hidden="true" />
+              Pano, filtreye uyan {result.totalCount} görevin bu sayfadaki {result.items.length} tanesini
+              gösterir. Sütun sayaçları da yalnızca bu sayfayı kapsar.
+            </p>
+          )}
+          <TaskBoard
+            tasks={result.items}
+            isLoading={isLoading}
+            onEdit={openEditDialog}
+            onStatusChange={(task, nextStatus) => applyTaskChange(task, { status: nextStatus })}
+          />
+          {result.totalCount > effectivePageSize && (
+            <Paginator
+              first={(pageNumber - 1) * effectivePageSize}
+              rows={effectivePageSize}
+              totalRecords={result.totalCount}
+              template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+              currentPageReportTemplate="{first}-{last} / {totalRecords} görev"
+              onPageChange={(event) => setPageNumber(event.page + 1)}
+            />
+          )}
+        </>
       ) : (
         <section className="task-table-card" aria-label="Görev listesi">
           <DataTable

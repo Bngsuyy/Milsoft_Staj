@@ -50,6 +50,12 @@ ConnectionStrings__Oracle=User Id=taskmanagement;Password=...;Data Source=localh
 
 EF migration dosyaları PostgreSQL provider'ı ile üretilmiştir. Oracle temiz kurulumu için Oracle scripti kullanılmalıdır; runtime `UseOracle` üzerinden aynı entity modelini kullanır.
 
+## Bağlantı bilgileri
+
+Parolalar depoda saklanmaz. `appsettings.Development.json` yalnızca parolasız bağlantı
+dizelerini içerir; parola ve JWT anahtarı User Secrets veya ortam değişkeni ile verilir
+(bkz. depo kökündeki `README.md`).
+
 ## Seed
 
 Her iki kurulumda demo kullanıcı bulunur:

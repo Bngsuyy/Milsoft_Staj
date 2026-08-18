@@ -24,14 +24,35 @@ Milsoft_Staj/
   değiştirme), görev detayı (yorum ve dosya ekleri), kategori yönetimi, profil düzenleme,
   Excel/PDF dışa aktarma, yazdırma, klavye kısayolları ve açık/koyu tema desteği hazır.
 
+> Dışa aktarma tek seferde en fazla 1000 görev alır. Sınır aşılırsa arayüz uyarı gösterir;
+> daha dar filtre uygulayarak veya listeden seçim yaparak tam çıktı alınabilir.
+
 ## Backend'i çalıştırma
 
-Geliştirme bağlantı ayarlarını `Backend/TaskManagement.API/appsettings.Development.json` içinde
-düzenleyin veya ortam değişkeni kullanın:
+### Gizli bilgiler
+
+Veritabanı parolası ve JWT anahtarı **depoda tutulmaz**. `appsettings.json` içindeki
+`JwtSettings:SecretKey` boştur; değer verilmezse uygulama açılışta anlamlı bir hatayla durur.
+Değerleri .NET User Secrets ile verin (önerilen):
+
+```powershell
+cd Backend/TaskManagement.API
+dotnet user-secrets set "ConnectionStrings:PostgreSQL" "Host=localhost;Port=5432;Database=TaskManagementDb;Username=postgres;Password=YOUR_PASSWORD"
+dotnet user-secrets set "JwtSettings:SecretKey" "EN_AZ_32_BAYTLIK_GELISTIRME_ANAHTARI"
+```
+
+Alternatif olarak ortam değişkeni kullanılabilir:
 
 ```powershell
 $env:ConnectionStrings__PostgreSQL='Host=localhost;Port=5432;Database=TaskManagementDb;Username=postgres;Password=YOUR_PASSWORD'
-$env:JwtSettings__SecretKey='YOUR_DEVELOPMENT_SECRET_WITH_AT_LEAST_32_BYTES'
+$env:JwtSettings__SecretKey='EN_AZ_32_BAYTLIK_GELISTIRME_ANAHTARI'
+```
+
+Production'da bu değerler ortam değişkeni veya bir secret yöneticisi üzerinden sağlanmalıdır.
+
+### Çalıştırma
+
+```powershell
 dotnet ef database update --project Backend/TaskManagement.API/TaskManagement.API.csproj
 dotnet run --project Backend/TaskManagement.API/TaskManagement.API.csproj --launch-profile http
 ```

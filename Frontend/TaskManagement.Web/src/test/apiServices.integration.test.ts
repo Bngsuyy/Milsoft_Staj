@@ -126,7 +126,36 @@ describe('API servis entegrasyonu', () => {
 
     const collected = await taskService.getAllMatching({ searchTerm: 'görev' })
 
-    expect(collected.map((item) => item.id)).toEqual(['task-1', 'task-2'])
+    expect(collected.items.map((item) => item.id)).toEqual(['task-1', 'task-2'])
+    expect(collected.isTruncated).toBe(false)
+    expect(collected.totalCount).toBe(2)
+  })
+
+  it('üst sınır aşıldığında dışa aktarmanın kesildiğini bildirir', async () => {
+    // Sunucu 1000'den fazla görev bildirir; servis sessizce kesmek yerine
+    // `isTruncated` ile durumu çağırana iletmelidir.
+    mock.onGet('/Tasks').reply((config) => {
+      const pageNumber = Number(config.params.pageNumber)
+      return [200, {
+        items: Array.from({ length: 50 }, (_, index) => ({
+          ...task,
+          id: `task-${(pageNumber - 1) * 50 + index}`,
+        })),
+        totalCount: 1200,
+        pageNumber,
+        pageSize: 50,
+        totalPages: 24,
+        hasPreviousPage: pageNumber > 1,
+        hasNextPage: pageNumber < 24,
+      } satisfies PagedResult<Task>]
+    })
+
+    const collected = await taskService.getAllMatching()
+
+    expect(collected.items).toHaveLength(1000)
+    expect(collected.isTruncated).toBe(true)
+    expect(collected.totalCount).toBe(1200)
+    expect(collected.limit).toBe(1000)
   })
 
   it('dosya yükleme, indirme ve silme isteklerini doğru gönderir', async () => {

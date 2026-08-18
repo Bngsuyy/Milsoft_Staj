@@ -16,6 +16,17 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly string _databaseName = $"api-tests-{Guid.NewGuid()}";
 
+    public ApiWebApplicationFactory()
+    {
+        // Uygulama JWT ayarlarını Build() öncesinde okuduğu için yapılandırma
+        // ortam değişkenleriyle verilir. Böylece depoda hiçbir anahtar tutulmaz.
+        Environment.SetEnvironmentVariable(
+            "JwtSettings__SecretKey",
+            "integration-tests-only-secret-key-32-bytes-minimum");
+        Environment.SetEnvironmentVariable("JwtSettings__Issuer", "TaskManagementAPI");
+        Environment.SetEnvironmentVariable("JwtSettings__Audience", "TaskManagementUI");
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");

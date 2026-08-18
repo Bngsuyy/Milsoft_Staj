@@ -112,7 +112,9 @@ export async function exportTasksToPdf(tasks: Task[]): Promise<void> {
         {
           table: {
             headerRows: 1,
-            widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            // Genişlikler sütun listesinden türetilir; elle yazılan dizi sütun
+            // sayısıyla uyuşmazsa pdfmake çalışma zamanında hata veriyor.
+            widths: pdfColumns.map((column) => column.header === 'Başlık' ? '*' : 'auto'),
             body: [
               pdfColumns.map((column) => ({ text: column.header, style: 'tableHeader' })),
               ...tasks.map((task) => pdfColumns.map((column) => column.value(task))),

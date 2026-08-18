@@ -1539,11 +1539,32 @@ a.recent-task-row:hover {
 }
 
 .task-filters {
-  display: grid;
-  grid-template-columns: minmax(14rem, 1.6fr) repeat(3, minmax(9rem, 1fr)) repeat(2, minmax(8.75rem, 0.9fr)) auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   align-items: end;
   margin-top: 1rem;
+}
+
+/* `min-width: 0` olmadan flex ögeleri içerik genişliğinde kalıp taşar. */
+.task-filters > * {
+  min-width: 0;
+}
+
+.task-filters > .task-search-field {
+  flex: 3 1 14rem;
+}
+
+.task-filters > .p-dropdown {
+  flex: 1 1 9.5rem;
+}
+
+.task-filters > .date-filter-field {
+  flex: 1 1 9rem;
+}
+
+.task-filters > .p-button {
+  flex: 0 0 auto;
 }
 
 .task-filters .p-dropdown,
@@ -2412,16 +2433,6 @@ a.recent-task-row:hover {
   gap: 0.1rem;
 }
 
-@media (max-width: 1200px) {
-  .task-filters {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .task-search-field {
-    grid-column: span 2;
-  }
-}
-
 @media (max-width: 1000px) {
   .task-detail-workspace {
     grid-template-columns: 1fr;
@@ -2429,13 +2440,19 @@ a.recent-task-row:hover {
 }
 
 @media (max-width: 760px) {
-  .task-filters,
   .task-form,
   .task-detail-information {
     grid-template-columns: 1fr;
   }
 
-  .task-search-field,
+  /* Dar ekranda her filtre tam satır kaplar. */
+  .task-filters > .task-search-field,
+  .task-filters > .p-dropdown,
+  .task-filters > .date-filter-field,
+  .task-filters > .p-button {
+    flex: 1 1 100%;
+  }
+
   .full-width-field {
     grid-column: auto;
   }
@@ -3514,4 +3531,28 @@ a.recent-task-row:hover {
   .profile-form {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.board-scope-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0 0 0.85rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgb(148 163 184 / 45%);
+  border-radius: 0.75rem;
+  background: rgb(241 245 249 / 80%);
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+.task-board + .p-paginator {
+  margin-top: 1rem;
+  border-radius: 0.9rem;
+}
+
+[data-theme="dark"] .board-scope-note {
+  border-color: rgb(71 85 105 / 70%);
+  background: rgb(30 41 59 / 60%);
+  color: #cbd5e1;
 }

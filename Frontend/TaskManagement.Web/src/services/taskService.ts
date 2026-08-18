@@ -22,6 +22,15 @@ const MAX_PAGE_SIZE = 50
 /** Dışa aktarmanın tarayıcıyı kilitlememesi için üst sınır. */
 const MAX_EXPORT_ITEMS = 1000
 
+export interface CollectedTasks {
+  items: Task[]
+  /** Filtreye uyan toplam görev sayısı (üst sınırdan bağımsız). */
+  totalCount: number
+  /** Üst sınır nedeniyle sonuç kesildiyse `true`. */
+  isTruncated: boolean
+  limit: number
+}
+
 export const taskService = {
   async getAll(filter: TaskFilter = {}): Promise<PagedResult<Task>> {
     const response = await apiClient.get<PagedResult<Task>>('/Tasks', { params: filter })
@@ -68,13 +77,18 @@ export const taskService = {
   },
 
   /**
-   * Dışa aktarma ve yazdırma için aktif filtreye uyan tüm görevleri sayfa sayfa toplar.
-   * `overdueOnly` verildiğinde vadesi geçen görev ucu kullanılır.
+   * Dışa aktarma ve yazdırma için aktif filtreye uyan görevleri sayfa sayfa toplar.
+   * `overdueOnly` verildiğinde vadesi geçen görev ucu kullanılır. Üst sınır aşılırsa
+   * sonuç sessizce kesilmez; `isTruncated` ile çağırana bildirilir.
    */
-  async getAllMatching(filter: TaskFilter = {}, overdueOnly = false): Promise<Task[]> {
+  async getAllMatching(
+    filter: TaskFilter = {},
+    overdueOnly = false,
+  ): Promise<CollectedTasks> {
     const collected: Task[] = []
     let pageNumber = 1
     let totalPages = 1
+    let totalCount = 0
 
     while (pageNumber <= totalPages && collected.length < MAX_EXPORT_ITEMS) {
       const page = overdueOnly
@@ -83,10 +97,18 @@ export const taskService = {
 
       collected.push(...page.items)
       totalPages = page.totalPages
+      totalCount = page.totalCount
       if (page.items.length === 0) break
       pageNumber += 1
     }
 
-    return collected.slice(0, MAX_EXPORT_ITEMS)
+    const items = collected.slice(0, MAX_EXPORT_ITEMS)
+
+    return {
+      items,
+      totalCount: Math.max(totalCount, items.length),
+      isTruncated: totalCount > items.length,
+      limit: MAX_EXPORT_ITEMS,
+    }
   },
 }
