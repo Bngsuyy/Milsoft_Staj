@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { AppFooter, AppHeader, AppSidebar } from '../components'
+import { AppFooter, AppHeader, AppSidebar, ChatWidget } from '../components'
 
 export function RootLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -35,6 +35,7 @@ export function RootLayout() {
           <Outlet />
         </main>
         <AppFooter />
+        <ChatWidget />
       </div>
     </div>
   )
