@@ -22,7 +22,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       <div className="sidebar-brand-row">
         <NavLink className="sidebar-brand" to="/dashboard" onClick={onClose}>
           <span className="app-mark" aria-hidden="true">
-            <i className="pi pi-check-square" />
+            <img src="/favicon.svg?v=2" alt="" />
           </span>
           <span>
             <strong>Task Management</strong>

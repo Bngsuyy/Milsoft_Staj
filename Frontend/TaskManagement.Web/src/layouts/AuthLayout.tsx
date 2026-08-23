@@ -9,7 +9,7 @@ export function AuthLayout() {
         <section className="auth-brand" aria-label="Uygulama tanıtımı">
           <div className="auth-brand-content">
             <span className="auth-logo inline-flex align-items-center justify-content-center">
-              <i className="pi pi-check-square" aria-hidden="true" />
+              <img src="/favicon.svg?v=2" alt="" aria-hidden="true" />
             </span>
             <p className="auth-eyebrow">Task Management System</p>
             <h1>Planla, takip et ve tamamla.</h1>
