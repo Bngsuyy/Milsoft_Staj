@@ -1,5 +1,5 @@
-import lightThemeUrl from 'primereact/resources/themes/lara-light-blue/theme.css?url'
-import darkThemeUrl from 'primereact/resources/themes/lara-dark-blue/theme.css?url'
+import lightThemeUrl from 'primereact/resources/themes/lara-light-pink/theme.css?url'
+import darkThemeUrl from 'primereact/resources/themes/lara-dark-pink/theme.css?url'
 import type { AppTheme } from '../contexts/ThemeContext'
 
 export const THEME_STORAGE_KEY = 'task-management-theme'
@@ -29,6 +29,16 @@ function updatePrimeTheme(theme: AppTheme) {
     themeLink = document.createElement('link')
     themeLink.id = PRIME_THEME_LINK_ID
     themeLink.rel = 'stylesheet'
+  }
+
+  // PrimeReact'in temel teması önce, uygulamanın kırmızı marka katmanı sonra gelsin.
+  const firstApplicationStyle = Array.from(
+    document.head.querySelectorAll<HTMLLinkElement | HTMLStyleElement>('link[rel="stylesheet"], style'),
+  ).find((element) => element !== themeLink)
+
+  if (firstApplicationStyle) {
+    document.head.insertBefore(themeLink, firstApplicationStyle)
+  } else if (!themeLink.isConnected) {
     document.head.appendChild(themeLink)
   }
 
@@ -44,7 +54,7 @@ export function applyTheme(theme: AppTheme, persist = false) {
   document.documentElement.style.colorScheme = theme
   document.querySelector('meta[name="theme-color"]')?.setAttribute(
     'content',
-    theme === 'dark' ? '#0f172a' : '#f6f8fc',
+    theme === 'dark' ? '#1b0d10' : '#faf7f8',
   )
   updatePrimeTheme(theme)
 

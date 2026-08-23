@@ -3556,3 +3556,364 @@ a.recent-task-row:hover {
   background: rgb(30 41 59 / 60%);
   color: #cbd5e1;
 }
+
+/* ==========================================================================
+   Kirmizi-beyaz marka temasi
+   Mevcut yerlesimi degistirmeden mavi marka renklerini kirmiziya tasir.
+   ========================================================================== */
+
+:root {
+  --brand-50: #fff1f2;
+  --brand-100: #ffe4e6;
+  --brand-200: #fecdd3;
+  --brand-300: #fda4af;
+  --brand-400: #fb7185;
+  --brand-500: #e11d48;
+  --brand-600: #c4162a;
+  --brand-700: #a30f24;
+  --brand-800: #881322;
+  --brand-900: #6f0d1b;
+  --primary-color: var(--brand-600);
+  --primary-color-text: #fff;
+  --highlight-bg: var(--brand-50);
+  --highlight-text-color: var(--brand-700);
+  --focus-ring: 0 0 0 0.2rem rgb(196 22 42 / 18%);
+  --primary-50: var(--brand-50);
+  --primary-100: var(--brand-100);
+  --primary-200: var(--brand-200);
+  --primary-300: var(--brand-300);
+  --primary-400: var(--brand-400);
+  --primary-500: var(--brand-500);
+  --primary-600: var(--brand-600);
+  --primary-700: var(--brand-700);
+  --primary-800: var(--brand-800);
+  --primary-900: var(--brand-900);
+  color: #2b2023;
+  background: #faf7f8;
+}
+
+.app-shell,
+.loading-screen {
+  background: #faf7f8;
+}
+
+.app-mark,
+.primary-button,
+.primary-action-button,
+.sidebar-link.is-active,
+.attachment-upload-progress .p-progressbar-value {
+  background: var(--brand-600);
+}
+
+.app-mark,
+.primary-button {
+  box-shadow: 0 0.75rem 1.5rem rgb(196 22 42 / 22%);
+}
+
+.primary-button:hover:not(:disabled),
+.primary-action-button:hover:not(:disabled) {
+  background: var(--brand-700);
+}
+
+.auth-page {
+  background:
+    radial-gradient(circle at 15% 15%, rgb(196 22 42 / 16%), transparent 28rem),
+    radial-gradient(circle at 85% 85%, rgb(232 74 95 / 12%), transparent 24rem),
+    #faf7f8;
+}
+
+.auth-brand {
+  color: var(--brand-100);
+  background:
+    linear-gradient(145deg, rgb(53 8 17 / 97%), rgb(139 16 36 / 94%)),
+    #350811;
+}
+
+.auth-brand .auth-eyebrow,
+.dashboard-welcome .page-eyebrow {
+  color: var(--brand-300);
+}
+
+.auth-brand-content > p:last-child,
+.dashboard-welcome p {
+  color: var(--brand-100);
+}
+
+.auth-feature-list {
+  color: var(--brand-100);
+}
+
+.auth-feature-list i,
+.sidebar-footer {
+  color: var(--brand-300);
+}
+
+.auth-eyebrow,
+.auth-switch a,
+.loading-spinner,
+.page-eyebrow,
+.back-link,
+.error-code,
+.dashboard-panel-heading > a,
+.recent-empty > i,
+.recent-empty a,
+.task-title-cell a:hover,
+.table-icon-link:hover,
+.task-workspace-icon,
+.comment-avatar,
+.attachment-dropzone > i,
+.attachment-upload-progress strong,
+.attachment-information button:hover,
+.bulk-actions-count {
+  color: var(--brand-600);
+}
+
+.input-shell:focus-within,
+.date-filter-field input:focus {
+  border-color: var(--brand-600);
+  box-shadow: var(--focus-ring);
+}
+
+.demo-account {
+  border-color: var(--brand-300);
+  color: var(--brand-700);
+  background: var(--brand-50);
+}
+
+.theme-toggle-button:hover,
+.table-icon-link:hover {
+  border-color: var(--brand-200);
+  color: var(--brand-600);
+  background: var(--brand-50);
+}
+
+.category-color-presets button:hover,
+.category-color-presets button.is-selected,
+.task-board-card:focus-visible {
+  outline-color: var(--brand-600);
+}
+
+.dashboard-welcome {
+  background:
+    radial-gradient(circle at 90% 10%, rgb(253 164 175 / 24%), transparent 18rem),
+    linear-gradient(135deg, #350811, var(--brand-800));
+  box-shadow: 0 1rem 2.5rem rgb(111 13 27 / 16%);
+}
+
+.dashboard-stat-card {
+  --stat-color: var(--brand-600);
+  --stat-bg: var(--brand-50);
+}
+
+.app-sidebar {
+  background:
+    radial-gradient(circle at 15% 0%, rgb(225 29 72 / 26%), transparent 16rem),
+    #25090f;
+}
+
+.sidebar-link.is-active {
+  background-color: var(--brand-600) !important;
+  background-image: none;
+  box-shadow: 0 0.7rem 1.5rem rgb(70 8 20 / 32%);
+}
+
+.header-avatar,
+.profile-page-avatar {
+  background: linear-gradient(135deg, var(--brand-600), var(--brand-400));
+}
+
+.empty-state-icon,
+.task-workspace-icon,
+.comment-avatar {
+  background: var(--brand-50);
+}
+
+.attachment-dropzone {
+  border-color: var(--brand-200);
+  background: #fffafb;
+}
+
+.attachment-dropzone.is-dragging {
+  border-color: var(--brand-600);
+  background: var(--brand-50);
+  box-shadow: var(--focus-ring);
+}
+
+.attachment-upload-progress .p-progressbar {
+  background: var(--brand-100);
+}
+
+.bulk-actions-bar {
+  border-color: rgb(196 22 42 / 34%);
+  background: rgb(196 22 42 / 8%);
+}
+
+.task-board-column.is-drop-target {
+  border-color: var(--brand-600);
+  background: rgb(196 22 42 / 9%);
+}
+
+.icon-button:focus-visible,
+.sidebar-link:focus-visible,
+.user-menu-trigger:focus-visible,
+.user-menu-item:focus-visible,
+.primary-action-button:focus-visible,
+.back-link:focus-visible,
+.attachment-information button:focus-visible {
+  outline-color: rgb(196 22 42 / 42%);
+}
+
+/* PrimeReact: yalnizca marka/etkilesim renkleri degisir; semantik etiketler korunur. */
+html body .p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-help) {
+  border-color: var(--brand-600);
+  color: #fff;
+  background: var(--brand-600);
+}
+
+html body .p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-help):enabled:hover {
+  border-color: var(--brand-700);
+  background: var(--brand-700);
+}
+
+html body .p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-help),
+html body .p-button.p-button-text:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-help),
+html body .p-button.p-button-link {
+  color: var(--brand-600);
+}
+
+html body .p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-help):enabled:hover,
+html body .p-button.p-button-text:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-help):enabled:hover {
+  color: var(--brand-700);
+  background: var(--brand-50);
+}
+
+html body .p-button:focus,
+html body .p-inputtext:enabled:focus,
+html body .p-dropdown:not(.p-disabled).p-focus,
+html body .p-colorpicker-preview:focus-visible {
+  border-color: var(--brand-600);
+  box-shadow: var(--focus-ring);
+}
+
+html body .p-inputtext:enabled:hover,
+html body .p-dropdown:not(.p-disabled):hover {
+  border-color: var(--brand-400);
+}
+
+html body .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+html body .p-datepicker table td > span.p-highlight,
+html body .p-datatable .p-datatable-tbody > tr.p-highlight > td,
+html body .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  color: var(--brand-700);
+  background: var(--brand-50);
+}
+
+html body .p-datepicker .p-datepicker-header .p-datepicker-title .p-datepicker-year:enabled:hover,
+html body .p-datepicker .p-datepicker-header .p-datepicker-title .p-datepicker-month:enabled:hover,
+html body .p-datepicker:not(.p-disabled) table td span:not(.p-highlight):not(.p-disabled):hover {
+  color: var(--brand-700);
+  background: var(--brand-50);
+}
+
+html body .p-checkbox.p-highlight .p-checkbox-box {
+  border-color: var(--brand-600);
+  background: var(--brand-600);
+}
+
+html body .p-progressbar .p-progressbar-value {
+  background: var(--brand-600);
+}
+
+html body .p-progress-spinner-circle {
+  stroke: var(--brand-600);
+}
+
+/* Koyu mod lacivert yerine sicak antrasit ve bordo yuzeyler kullanir. */
+html[data-theme="dark"],
+[data-theme="dark"] body,
+[data-theme="dark"] .app-shell,
+[data-theme="dark"] .loading-screen {
+  color: #f6eef0;
+  background: #160b0e;
+}
+
+[data-theme="dark"] .auth-page {
+  background:
+    radial-gradient(circle at 15% 15%, rgb(196 22 42 / 18%), transparent 28rem),
+    radial-gradient(circle at 85% 85%, rgb(232 74 95 / 11%), transparent 24rem),
+    #160b0e;
+}
+
+[data-theme="dark"] .auth-shell,
+[data-theme="dark"] .auth-panel,
+[data-theme="dark"] .user-menu-panel,
+[data-theme="dark"] .category-card,
+[data-theme="dark"] .dashboard-stat-card,
+[data-theme="dark"] .dashboard-panel,
+[data-theme="dark"] .task-toolbar,
+[data-theme="dark"] .task-table-card,
+[data-theme="dark"] .task-detail-card,
+[data-theme="dark"] .task-workspace-card,
+[data-theme="dark"] .empty-state-card,
+[data-theme="dark"] .profile-panel,
+[data-theme="dark"] .fatal-error-card {
+  border-color: #4a2b32;
+  background: #211316;
+}
+
+[data-theme="dark"] .app-header {
+  border-color: #44262d;
+  background: rgb(31 17 21 / 95%);
+}
+
+[data-theme="dark"] .input-shell,
+[data-theme="dark"] .secondary-button,
+[data-theme="dark"] .theme-toggle-button,
+[data-theme="dark"] .user-menu-trigger:hover,
+[data-theme="dark"] .user-menu-trigger[aria-expanded="true"],
+[data-theme="dark"] .task-detail-header,
+[data-theme="dark"] .task-workspace-heading,
+[data-theme="dark"] .profile-panel-heading,
+[data-theme="dark"] .task-table-card .p-datatable-thead > tr > th,
+[data-theme="dark"] .task-table-card .p-paginator,
+[data-theme="dark"] .date-filter-field input,
+[data-theme="dark"] .category-color-field,
+[data-theme="dark"] .attachment-dropzone,
+[data-theme="dark"] .attachment-upload-progress {
+  border-color: #51313a;
+  background: #2b191e;
+}
+
+[data-theme="dark"] .task-table-card .p-datatable-tbody > tr > td {
+  border-color: #4a2b32;
+  background: #211316;
+}
+
+[data-theme="dark"] .task-table-card .p-datatable-tbody > tr:hover > td,
+[data-theme="dark"] .secondary-button:hover,
+[data-theme="dark"] .user-menu-item:hover,
+[data-theme="dark"] .mobile-menu-button {
+  background: #342027;
+}
+
+[data-theme="dark"] .demo-account,
+[data-theme="dark"] .theme-toggle-button:hover,
+[data-theme="dark"] .attachment-dropzone.is-dragging {
+  border-color: var(--brand-500);
+  color: var(--brand-300);
+  background: rgb(196 22 42 / 16%);
+}
+
+[data-theme="dark"] .category-card:hover,
+[data-theme="dark"] .dashboard-stat-card:hover {
+  border-color: var(--brand-500);
+}
+
+[data-theme="dark"] .bulk-actions-bar {
+  border-color: rgb(225 29 72 / 42%);
+  background: rgb(196 22 42 / 18%);
+}
+
+[data-theme="dark"] .bulk-actions-count {
+  color: var(--brand-300);
+}
