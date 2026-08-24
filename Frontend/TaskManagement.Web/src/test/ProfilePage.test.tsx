@@ -1,10 +1,14 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ProfilePage } from '../pages/ProfilePage'
 import type { User } from '../types'
 
-const authMocks = vi.hoisted(() => ({ updateProfile: vi.fn() }))
+const authMocks = vi.hoisted(() => ({
+  updateProfile: vi.fn(),
+  uploadProfileImage: vi.fn(),
+  deleteProfileImage: vi.fn(),
+}))
 
 const demoUser: User = {
   id: 'user-1',
@@ -12,17 +16,25 @@ const demoUser: User = {
   email: 'demo@example.com',
   firstName: 'Demo',
   lastName: 'User',
+  profileImageUrl: null,
   isActive: true,
   createdAt: '2026-01-15T09:00:00Z',
 }
 
 vi.mock('../hooks', () => ({
-  useAuth: () => ({ user: demoUser, updateProfile: authMocks.updateProfile }),
+  useAuth: () => ({
+    user: demoUser,
+    updateProfile: authMocks.updateProfile,
+    uploadProfileImage: authMocks.uploadProfileImage,
+    deleteProfileImage: authMocks.deleteProfileImage,
+  }),
 }))
 
 describe('ProfilePage', () => {
   beforeEach(() => {
     authMocks.updateProfile.mockReset().mockResolvedValue(demoUser)
+    authMocks.uploadProfileImage.mockReset().mockResolvedValue(demoUser)
+    authMocks.deleteProfileImage.mockReset().mockResolvedValue(demoUser)
   })
 
   it('hesap bilgilerini salt okunur olarak listeler', () => {
@@ -30,6 +42,7 @@ describe('ProfilePage', () => {
 
     expect(screen.getByText('demo@example.com')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bilgileri düzenle' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Fotoğraf yükle' })).toBeInTheDocument()
   })
 
   it('geçersiz e-posta ile API isteği göndermez', async () => {
@@ -44,6 +57,16 @@ describe('ProfilePage', () => {
 
     expect(screen.getByText('Geçerli bir e-posta adresi girin.')).toBeInTheDocument()
     expect(authMocks.updateProfile).not.toHaveBeenCalled()
+  })
+
+  it('seçilen geçerli profil fotoğrafını yükler', async () => {
+    const user = userEvent.setup()
+    render(<ProfilePage />)
+    const file = new File(['profile-photo'], 'avatar.jpg', { type: 'image/jpeg' })
+
+    await user.upload(screen.getByLabelText('Profil fotoğrafı seç'), file)
+
+    await waitFor(() => expect(authMocks.uploadProfileImage).toHaveBeenCalledWith(file))
   })
 
   it('geçerli formu kırpılmış değerlerle gönderir', async () => {

@@ -13,7 +13,11 @@ namespace TaskManagement.API
             CreateMap<UpdateUserDto, User>()
                 .ForMember(destination => destination.Email,
                     options => options.Condition(source => !string.IsNullOrWhiteSpace(source.Email)));
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(destination => destination.ProfileImageUrl,
+                    options => options.MapFrom(source => string.IsNullOrWhiteSpace(source.ProfileImagePath)
+                        ? null
+                        : $"/profile-images/{source.ProfileImagePath}"));
 
             // Category Mappings
             CreateMap<CreateCategoryDto, Category>();

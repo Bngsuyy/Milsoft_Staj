@@ -24,6 +24,7 @@ namespace TaskManagement.API.Data
                 entity.Property(u => u.PasswordHash).HasMaxLength(255).IsRequired();
                 entity.Property(u => u.FirstName).HasMaxLength(50).IsRequired();
                 entity.Property(u => u.LastName).HasMaxLength(50).IsRequired();
+                entity.Property(u => u.ProfileImagePath).HasMaxLength(120);
                 entity.HasIndex(u => u.Username).IsUnique();
                 entity.HasIndex(u => u.Email).IsUnique();
             });

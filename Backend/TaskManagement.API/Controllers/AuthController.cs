@@ -51,6 +51,24 @@ namespace TaskManagement.API.Controllers
             return Ok(user);
         }
 
+        [HttpPost("profile/image")]
+        [Authorize]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(5 * 1024 * 1024 + 64 * 1024)]
+        public async Task<IActionResult> UploadProfileImage(IFormFile file)
+        {
+            var user = await _userService.UploadProfileImageAsync(GetUserId(), file);
+            return Ok(user);
+        }
+
+        [HttpDelete("profile/image")]
+        [Authorize]
+        public async Task<IActionResult> DeleteProfileImage()
+        {
+            var user = await _userService.DeleteProfileImageAsync(GetUserId());
+            return Ok(user);
+        }
+
         private Guid GetUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

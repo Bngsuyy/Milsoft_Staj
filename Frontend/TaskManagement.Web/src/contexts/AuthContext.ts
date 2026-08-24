@@ -10,6 +10,8 @@ export interface AuthContextValue {
   logout: () => void
   refreshProfile: () => Promise<User>
   updateProfile: (request: UpdateProfileRequest) => Promise<User>
+  uploadProfileImage: (file: File) => Promise<User>
+  deleteProfileImage: () => Promise<User>
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined)

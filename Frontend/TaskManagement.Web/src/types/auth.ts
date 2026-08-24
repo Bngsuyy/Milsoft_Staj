@@ -6,6 +6,7 @@ export interface User {
   email: string
   firstName: string
   lastName: string
+  profileImageUrl: string | null
   isActive: boolean
   createdAt: IsoDateString
 }

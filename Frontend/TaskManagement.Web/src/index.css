@@ -2921,9 +2921,18 @@ a.recent-task-row:hover {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   color: #fff;
   background: linear-gradient(135deg, #2563eb, #0ea5e9);
   font-weight: 800;
+}
+
+.user-avatar-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
 }
 
 .header-avatar {
@@ -3163,10 +3172,14 @@ a.recent-task-row:hover {
 .profile-panel-heading {
   display: flex;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-start;
   padding: 1.5rem;
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
+}
+
+.profile-avatar-shell {
+  flex: 0 0 auto;
 }
 
 .profile-page-avatar {
@@ -3180,11 +3193,33 @@ a.recent-task-row:hover {
   margin: 0;
 }
 
-.profile-panel-heading span:last-child {
+.profile-identity {
+  min-width: 0;
+}
+
+.profile-identity > span {
   display: inline-block;
   margin-top: 0.25rem;
   color: #64748b;
   font-size: 0.82rem;
+}
+
+.profile-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+}
+
+.profile-photo-actions .p-button {
+  font-size: 0.76rem;
+}
+
+.profile-photo-hint {
+  display: block;
+  margin-top: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.7rem;
 }
 
 .profile-information {
@@ -4100,6 +4135,10 @@ html[data-theme="dark"],
 [data-theme="dark"] .attachment-upload-progress {
   border-color: #51313a;
   background: #2b191e;
+}
+
+[data-theme="dark"] .profile-photo-hint {
+  color: #a98b93;
 }
 
 [data-theme="dark"] .task-table-card .p-datatable-tbody > tr > td {

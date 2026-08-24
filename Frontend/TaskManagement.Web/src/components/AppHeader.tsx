@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks'
 import { ThemeToggleButton } from './ThemeToggleButton'
+import { UserAvatar } from './UserAvatar'
 
 interface AppHeaderProps {
   onMenuOpen: () => void
@@ -52,8 +53,6 @@ export function AppHeader({ onMenuOpen }: AppHeaderProps) {
     navigate('/login', { replace: true })
   }
 
-  const initials = `${user?.firstName.charAt(0) ?? ''}${user?.lastName.charAt(0) ?? ''}` || 'K'
-
   return (
     <header className="app-header">
       <div className="header-heading">
@@ -82,7 +81,7 @@ export function AppHeader({ onMenuOpen }: AppHeaderProps) {
             aria-haspopup="menu"
             onClick={() => setIsUserMenuOpen((current) => !current)}
           >
-            <span className="header-avatar" aria-hidden="true">{initials.toLocaleUpperCase('tr-TR')}</span>
+            {user && <UserAvatar user={user} className="header-avatar" />}
             <span className="user-menu-name">
               <strong>{user?.firstName} {user?.lastName}</strong>
               <small>@{user?.username}</small>

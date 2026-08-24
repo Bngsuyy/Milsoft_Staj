@@ -138,6 +138,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
+app.UseStaticFiles();
+
 // 8. Global Exception Handling Middleware
 app.UseMiddleware<ExceptionMiddleware>();
 

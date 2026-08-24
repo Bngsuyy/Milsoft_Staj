@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
+import { UserAvatar } from '../components'
 import { useAuth } from '../hooks'
 import type { UpdateProfileRequest } from '../types'
 import { getApiErrorMessage } from '../utils'
@@ -12,6 +13,9 @@ const dateFormatter = new Intl.DateTimeFormat('tr-TR', {
   month: 'long',
   year: 'numeric',
 })
+
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024
+const PROFILE_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 type ProfileErrors = Partial<Record<keyof UpdateProfileRequest, string>>
 
@@ -45,16 +49,16 @@ function validate(form: ProfileFormState): ProfileErrors {
 }
 
 export function ProfilePage() {
-  const { user, updateProfile } = useAuth()
+  const { user, updateProfile, uploadProfileImage, deleteProfileImage } = useAuth()
   const toast = useRef<Toast>(null)
+  const photoInput = useRef<HTMLInputElement>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState<ProfileFormState>({ firstName: '', lastName: '', email: '' })
   const [errors, setErrors] = useState<ProfileErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isPhotoSubmitting, setIsPhotoSubmitting] = useState(false)
 
   if (!user) return null
-
-  const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toLocaleUpperCase('tr-TR')
 
   function startEditing() {
     if (!user) return
@@ -100,6 +104,68 @@ export function ProfilePage() {
     }
   }
 
+  async function handlePhotoSelected(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    if (!PROFILE_IMAGE_TYPES.includes(file.type)) {
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Desteklenmeyen görsel',
+        detail: 'JPG, PNG veya WebP formatında bir fotoğraf seçin.',
+      })
+      return
+    }
+
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Dosya çok büyük',
+        detail: 'Profil fotoğrafı en fazla 5 MB olabilir.',
+      })
+      return
+    }
+
+    setIsPhotoSubmitting(true)
+    try {
+      await uploadProfileImage(file)
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Fotoğraf güncellendi',
+        detail: 'Yeni profil fotoğrafın kaydedildi.',
+      })
+    } catch (error) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Fotoğraf yüklenemedi',
+        detail: getApiErrorMessage(error, 'Profil fotoğrafı kaydedilirken bir hata oluştu.'),
+      })
+    } finally {
+      setIsPhotoSubmitting(false)
+    }
+  }
+
+  async function handlePhotoDelete() {
+    setIsPhotoSubmitting(true)
+    try {
+      await deleteProfileImage()
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Fotoğraf kaldırıldı',
+        detail: 'Baş harf avatarın yeniden etkinleştirildi.',
+      })
+    } catch (error) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Fotoğraf kaldırılamadı',
+        detail: getApiErrorMessage(error, 'Profil fotoğrafı kaldırılırken bir hata oluştu.'),
+      })
+    } finally {
+      setIsPhotoSubmitting(false)
+    }
+  }
+
   return (
     <div className="content-page profile-page">
       <Toast ref={toast} position="top-right" />
@@ -117,10 +183,45 @@ export function ProfilePage() {
 
       <section className="profile-panel">
         <div className="profile-panel-heading">
-          <span className="profile-page-avatar" aria-hidden="true">{initials}</span>
-          <div>
+          <div className="profile-avatar-shell">
+            <UserAvatar user={user} className="profile-page-avatar" />
+          </div>
+          <div className="profile-identity">
             <h3>{user.firstName} {user.lastName}</h3>
             <span>@{user.username}</span>
+            <input
+              ref={photoInput}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              aria-label="Profil fotoğrafı seç"
+              hidden
+              onChange={handlePhotoSelected}
+            />
+            <div className="profile-photo-actions">
+              <Button
+                type="button"
+                label={user.profileImageUrl ? 'Fotoğrafı değiştir' : 'Fotoğraf yükle'}
+                icon="pi pi-camera"
+                size="small"
+                outlined
+                loading={isPhotoSubmitting}
+                disabled={isPhotoSubmitting}
+                onClick={() => photoInput.current?.click()}
+              />
+              {user.profileImageUrl && (
+                <Button
+                  type="button"
+                  label="Fotoğrafı kaldır"
+                  icon="pi pi-trash"
+                  size="small"
+                  severity="danger"
+                  text
+                  disabled={isPhotoSubmitting}
+                  onClick={handlePhotoDelete}
+                />
+              )}
+            </div>
+            <small className="profile-photo-hint">JPG, PNG veya WebP · En fazla 5 MB</small>
           </div>
         </div>
 

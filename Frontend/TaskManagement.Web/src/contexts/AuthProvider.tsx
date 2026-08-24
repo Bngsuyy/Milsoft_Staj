@@ -76,6 +76,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return profile
   }, [])
 
+  const uploadProfileImage = useCallback(async (file: File) => {
+    const profile = await authService.uploadProfileImage(file)
+    setUser(profile)
+    return profile
+  }, [])
+
+  const deleteProfileImage = useCallback(async () => {
+    const profile = await authService.deleteProfileImage()
+    setUser(profile)
+    return profile
+  }, [])
+
   const value = useMemo(
     () => ({
       user,
@@ -86,8 +98,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
       logout,
       refreshProfile,
       updateProfile,
+      uploadProfileImage,
+      deleteProfileImage,
     }),
-    [user, isLoading, login, register, logout, refreshProfile, updateProfile],
+    [
+      user,
+      isLoading,
+      login,
+      register,
+      logout,
+      refreshProfile,
+      updateProfile,
+      uploadProfileImage,
+      deleteProfileImage,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
