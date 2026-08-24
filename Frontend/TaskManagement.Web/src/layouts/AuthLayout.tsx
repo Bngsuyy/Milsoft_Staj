@@ -1,9 +1,12 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { ThemeToggleButton } from '../components'
 
 export function AuthLayout() {
+  const { pathname } = useLocation()
+  const isLoginPage = pathname === '/login'
+
   return (
-    <main className="auth-page">
+    <main className={`auth-page${isLoginPage ? ' auth-page--login' : ''}`}>
       <ThemeToggleButton className="auth-theme-toggle" />
       <div className="auth-shell">
         <section className="auth-brand" aria-label="Uygulama tanıtımı">
@@ -11,10 +14,10 @@ export function AuthLayout() {
             <span className="auth-logo inline-flex align-items-center justify-content-center">
               <img src="/favicon.svg?v=2" alt="" aria-hidden="true" />
             </span>
-            <p className="auth-eyebrow">Task Management System</p>
-            <h1>Planla, takip et ve tamamla.</h1>
-            <p>
-              Günlük görevlerini, kategorilerini ve teslim tarihlerini tek bir yerde yönet.
+            <h1 className="auth-product-title">Task Management System</h1>
+            <p className="auth-message">
+              <strong className="auth-vision">Planla, takip et ve tamamla.</strong>
+              <span>Günlük görevlerini, kategorilerini ve teslim tarihlerini tek bir yerde yönet.</span>
             </p>
           </div>
 

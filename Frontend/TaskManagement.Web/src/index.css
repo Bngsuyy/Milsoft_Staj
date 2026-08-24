@@ -1,7 +1,8 @@
 :root {
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Inter var", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   color: #162033;
   background: #f5f7fb;
   font-synthesis: none;
@@ -61,30 +62,41 @@ a {
 }
 
 .auth-page {
+  --auth-page-space: clamp(1rem, 2vw, 1.5rem);
+
+  display: grid;
   min-height: 100vh;
-  padding: 1rem;
+  padding: 0;
   background:
     radial-gradient(circle at 15% 15%, rgb(59 130 246 / 18%), transparent 28rem),
     radial-gradient(circle at 85% 85%, rgb(14 165 233 / 14%), transparent 24rem),
     #eef3fb;
 }
 
+.auth-page--login {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .auth-shell {
   display: grid;
-  width: min(100%, 76rem);
-  min-height: calc(100vh - 2rem);
-  margin: 0 auto;
-  overflow: hidden;
-  border: 1px solid rgb(203 213 225 / 80%);
-  border-radius: 1.5rem;
-  background: #fff;
-  box-shadow: 0 2rem 5rem rgb(15 23 42 / 12%);
+  gap: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.auth-page--login .auth-shell {
+  height: 100%;
+  min-height: 0;
 }
 
 .auth-brand {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-width: 0;
   padding: clamp(2rem, 6vw, 4.5rem);
   color: #dbeafe;
   background:
@@ -113,31 +125,44 @@ a {
 .auth-eyebrow {
   margin: 0 0 0.75rem;
   color: #2563eb;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.auth-brand .auth-eyebrow {
-  color: #93c5fd;
-}
-
-.auth-brand h1 {
-  max-width: 32rem;
+.auth-product-title {
+  max-width: 38rem;
   margin: 0;
   color: #fff;
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  line-height: 1.02;
-  letter-spacing: -0.055em;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
 }
 
-.auth-brand-content > p:last-child {
-  max-width: 32rem;
-  margin: 1.5rem 0 0;
-  color: #bfdbfe;
-  font-size: 1.05rem;
-  line-height: 1.7;
+.auth-message {
+  max-width: 35rem;
+  margin: 1.35rem 0 0;
+  color: var(--brand-100, #ffe4e6);
+  font-size: clamp(1.05rem, 1.2vw, 1.15rem);
+  font-weight: 450;
+  line-height: 1.65;
+}
+
+.auth-vision {
+  color: var(--brand-200, #fecdd3);
+  font-size: inherit;
+  font-weight: 650;
+  line-height: inherit;
+  letter-spacing: -0.01em;
+}
+
+.auth-message span {
+  margin-left: 0.4rem;
+  color: var(--brand-100, #ffe4e6);
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .auth-feature-list {
@@ -166,7 +191,7 @@ a {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: clamp(2rem, 6vw, 4.5rem);
+  padding: clamp(2rem, 5vw, 4.5rem);
 }
 
 .auth-panel::before {
@@ -189,7 +214,9 @@ a {
   margin: 0;
   color: #0f172a;
   font-size: clamp(2rem, 4vw, 2.8rem);
-  letter-spacing: -0.04em;
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
 }
 
 .auth-form-heading > p:last-child {
@@ -376,13 +403,8 @@ a {
 }
 
 @media (min-width: 900px) {
-  .auth-page {
-    padding: 2rem;
-  }
-
   .auth-shell {
-    grid-template-columns: minmax(0, 1fr) minmax(27rem, 0.85fr);
-    min-height: calc(100vh - 4rem);
+    grid-template-columns: minmax(22rem, 1fr) minmax(27rem, 1fr);
   }
 
   .form-row {
@@ -393,28 +415,17 @@ a {
 
 @media (max-width: 899px) {
   .auth-brand {
-    min-height: 22rem;
+    display: none;
   }
 }
 
 @media (max-width: 520px) {
   .auth-page {
-    padding: 0;
+    --auth-page-space: 1rem;
   }
 
   .auth-shell {
     min-height: 100vh;
-    border: 0;
-    border-radius: 0;
-  }
-
-  .auth-brand {
-    min-height: 18rem;
-    padding: 2rem 1.25rem;
-  }
-
-  .auth-feature-list {
-    display: none;
   }
 
   .auth-panel {
@@ -424,6 +435,93 @@ a {
   .secondary-button {
     padding: 0.7rem;
     font-size: 0.82rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .auth-page--login {
+    --auth-page-space: 1rem;
+  }
+
+  .auth-page--login .auth-brand {
+    padding: 2rem;
+  }
+
+  .auth-page--login .auth-logo {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .auth-page--login .auth-product-title {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+  }
+
+  .auth-page--login .auth-vision {
+    font-size: inherit;
+  }
+
+  .auth-page--login .auth-brand-content > p:last-child,
+  .auth-page--login .auth-feature-list {
+    margin-top: 1rem;
+  }
+
+  .auth-page--login .auth-panel {
+    padding-block: 0.5rem;
+  }
+
+  .auth-page--login .auth-form-heading h2 {
+    font-size: clamp(1.75rem, 4vw, 2.35rem);
+  }
+
+  .auth-page--login .auth-form-heading > p:last-child {
+    margin-top: 0.4rem;
+  }
+
+  .auth-page--login .auth-form {
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .auth-page--login .form-field {
+    gap: 0.3rem;
+  }
+
+  .auth-page--login .input-shell input {
+    padding-block: 0.7rem;
+  }
+
+  .auth-page--login .primary-button {
+    min-height: 2.8rem;
+  }
+
+  .auth-page--login .form-alert {
+    margin-top: 0.75rem;
+    padding-block: 0.7rem;
+  }
+
+  .auth-page--login .demo-account {
+    margin-top: 0.75rem;
+    padding: 0.7rem;
+  }
+
+  .auth-page--login .auth-switch {
+    margin-top: 0.85rem;
+  }
+}
+
+@media (max-height: 520px) {
+  .auth-page--login .auth-brand-content > p:last-child,
+  .auth-page--login .auth-feature-list,
+  .auth-page--login .auth-form-heading > p:last-child,
+  .auth-page--login .demo-account {
+    display: none;
+  }
+}
+
+@media (max-height: 440px) {
+  .auth-page--login .auth-switch {
+    display: none;
   }
 }
 
@@ -464,8 +562,8 @@ a {
 
 .auth-theme-toggle {
   position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
+  top: var(--auth-page-space, 1.5rem);
+  right: var(--auth-page-space, 1.5rem);
   z-index: 10;
 }
 
@@ -548,10 +646,9 @@ html[data-theme="dark"] {
     #0b1220;
 }
 
-[data-theme="dark"] .auth-shell,
 [data-theme="dark"] .auth-panel {
   border-color: #273449;
-  background: #111c2f;
+  background: transparent;
 }
 
 [data-theme="dark"] .auth-form-heading h2,
@@ -809,8 +906,8 @@ html[data-theme="dark"] {
 
 @media (max-width: 520px) {
   .auth-theme-toggle {
-    top: 0.75rem;
-    right: 0.75rem;
+    top: var(--auth-page-space);
+    right: var(--auth-page-space);
   }
 
   .fatal-error-actions {
@@ -2745,11 +2842,14 @@ a.recent-task-row:hover {
   pointer-events: none;
 }
 
-.app-workspace > .app-header,
 .app-workspace > .app-content,
 .app-workspace > .app-footer {
   position: relative;
   z-index: 1;
+}
+
+.app-workspace > .app-header {
+  z-index: 30;
 }
 
 .app-header {
@@ -3964,8 +4064,6 @@ html[data-theme="dark"],
     #160b0e;
 }
 
-[data-theme="dark"] .auth-shell,
-[data-theme="dark"] .auth-panel,
 [data-theme="dark"] .user-menu-panel,
 [data-theme="dark"] .category-card,
 [data-theme="dark"] .dashboard-stat-card,
