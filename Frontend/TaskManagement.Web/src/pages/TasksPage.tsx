@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
-import type { ColumnEditorOptions } from 'primereact/column'
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
 import { DataTable } from 'primereact/datatable'
 import type { DataTablePageEvent } from 'primereact/datatable'
@@ -438,37 +437,6 @@ export function TasksPage() {
     </div>
   )
 
-  const titleEditor = (options: ColumnEditorOptions) => (
-    <InputText
-      className="inline-editor-input"
-      value={options.value as string}
-      maxLength={200}
-      autoFocus
-      aria-label="Görev başlığı"
-      onChange={(event) => options.editorCallback?.(event.target.value)}
-    />
-  )
-
-  const statusEditor = (options: ColumnEditorOptions) => (
-    <Dropdown
-      className="inline-editor-input"
-      value={options.value as TaskStatus}
-      options={statusOptions}
-      aria-label="Görev durumu"
-      onChange={(event) => options.editorCallback?.(event.value)}
-    />
-  )
-
-  const priorityEditor = (options: ColumnEditorOptions) => (
-    <Dropdown
-      className="inline-editor-input"
-      value={options.value as Priority}
-      options={priorityOptions}
-      aria-label="Görev önceliği"
-      onChange={(event) => options.editorCallback?.(event.value)}
-    />
-  )
-
   const categoryTemplate = (task: Task) => task.category ? (
     <span className="category-cell">
       <span className="category-color" style={{ backgroundColor: task.category.color }} aria-hidden="true" />
@@ -735,7 +703,6 @@ export function TasksPage() {
             rowClassName={(task) => isTaskOverdue(task) ? 'overdue-task-row' : ''}
             stripedRows
             scrollable
-            editMode="cell"
             selection={selectedTasks}
             selectionMode="checkbox"
             onSelectionChange={(event) => setSelectedTasks(event.value as Task[])}
@@ -755,12 +722,6 @@ export function TasksPage() {
               header="Görev"
               field="title"
               body={titleTemplate}
-              editor={titleEditor}
-              onCellEditComplete={(event) => {
-                const nextTitle = String(event.newValue ?? '').trim()
-                if (!nextTitle || nextTitle === event.rowData.title) return
-                void applyTaskChange(event.rowData as Task, { title: nextTitle })
-              }}
               style={{ minWidth: '14rem' }}
             />
             <Column
@@ -771,11 +732,6 @@ export function TasksPage() {
               headerClassName="text-center"
               bodyClassName="text-center"
               body={(task: Task) => <StatusTag status={task.status} />}
-              editor={statusEditor}
-              onCellEditComplete={(event) => {
-                if (event.newValue === event.rowData.status) return
-                void applyTaskChange(event.rowData as Task, { status: event.newValue as TaskStatus })
-              }}
               headerStyle={{ textAlign: 'center' }}
               style={{ width: '9.5rem', minWidth: '9.5rem', textAlign: 'center' }}
             />
@@ -787,11 +743,6 @@ export function TasksPage() {
               headerClassName="text-center"
               bodyClassName="text-center"
               body={(task: Task) => <PriorityTag priority={task.priority} />}
-              editor={priorityEditor}
-              onCellEditComplete={(event) => {
-                if (event.newValue === event.rowData.priority) return
-                void applyTaskChange(event.rowData as Task, { priority: event.newValue as Priority })
-              }}
               headerStyle={{ textAlign: 'center' }}
               style={{ width: '8.5rem', minWidth: '8.5rem', textAlign: 'center' }}
             />
