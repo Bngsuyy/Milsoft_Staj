@@ -14,5 +14,6 @@ namespace TaskManagement.API.Services.Interfaces
         Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId);
         Task<int> BulkUpdateStatusAsync(Guid userId, BulkTaskStatusDto bulkStatusDto);
         Task<int> BulkDeleteAsync(Guid userId, BulkTaskDeleteDto bulkDeleteDto);
+        Task<List<TaskItemDto>> BulkCreateTasksAsync(Guid userId, BulkTaskCreateDto bulkCreateDto);
     }
 }

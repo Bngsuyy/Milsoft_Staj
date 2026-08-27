@@ -12,3 +12,12 @@ export {
   priorityOptions,
   statusOptions,
 } from './taskPresentation'
+export { exportTasksToExcel, exportTasksToPdf, printTasks } from './taskExport'
+export {
+  downloadExcelTemplate,
+  downloadJsonTemplate,
+  parseImportFile,
+  convertToCreateTaskRequests,
+} from './taskImport'
+export type { ParsedImportTask, TaskImportResult } from './taskImport'
+

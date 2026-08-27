@@ -76,6 +76,11 @@ export const taskService = {
     return response.data
   },
 
+  async bulkCreate(tasks: CreateTask[]): Promise<Task[]> {
+    const response = await apiClient.post<Task[]>('/Tasks/bulk-create', { tasks })
+    return response.data
+  },
+
   /**
    * Dışa aktarma ve yazdırma için aktif filtreye uyan görevleri sayfa sayfa toplar.
    * `overdueOnly` verildiğinde vadesi geçen görev ucu kullanılır. Üst sınır aşılırsa

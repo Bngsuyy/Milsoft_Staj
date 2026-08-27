@@ -26,7 +26,6 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           </span>
           <span>
             <strong>Task Management</strong>
-            <small>Görevlerini kolayca yönet</small>
           </span>
         </NavLink>
         <button
@@ -54,14 +53,6 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           </NavLink>
         ))}
       </nav>
-
-      <div className="sidebar-footer">
-        <i className="pi pi-shield" aria-hidden="true" />
-        <div>
-          <strong>Güvenli oturum</strong>
-          <span>JWT ile korunuyor</span>
-        </div>
-      </div>
     </aside>
   )
 }

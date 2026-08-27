@@ -20,25 +20,44 @@ namespace TaskManagement.API.Services
 
         public async Task<List<CategoryDto>> GetAllCategoriesAsync(Guid userId)
         {
-            var categories = await _context.Categories
+            var categoriesWithCounts = await _context.Categories
                 .AsNoTracking()
                 .Where(c => c.UserId == userId)
                 .OrderBy(c => c.Name)
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Color = c.Color,
+                    CreatedAt = c.CreatedAt,
+                    TaskCount = _context.Tasks.Count(t => t.UserId == userId && t.CategoryId == c.Id)
+                })
                 .ToListAsync();
 
-            return _mapper.Map<List<CategoryDto>>(categories);
+            return categoriesWithCounts;
         }
 
         public async Task<CategoryDto> GetCategoryByIdAsync(Guid id, Guid userId)
         {
             var category = await _context.Categories
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+                .Where(c => c.Id == id && c.UserId == userId)
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Color = c.Color,
+                    CreatedAt = c.CreatedAt,
+                    TaskCount = _context.Tasks.Count(t => t.UserId == userId && t.CategoryId == c.Id)
+                })
+                .FirstOrDefaultAsync();
 
             if (category == null)
                 throw new KeyNotFoundException("Kategori bulunamadı veya bu kategoriye erişim yetkiniz yok.");
 
-            return _mapper.Map<CategoryDto>(category);
+            return category;
         }
 
         public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategoryDto, Guid userId)

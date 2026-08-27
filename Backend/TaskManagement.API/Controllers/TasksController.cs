@@ -98,5 +98,13 @@ namespace TaskManagement.API.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("bulk-create")]
+        public async Task<IActionResult> BulkCreate([FromBody] BulkTaskCreateDto bulkCreateDto)
+        {
+            var userId = GetUserId();
+            var createdTasks = await _taskService.BulkCreateTasksAsync(userId, bulkCreateDto);
+            return Ok(createdTasks);
+        }
     }
 }

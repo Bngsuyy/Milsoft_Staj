@@ -17,6 +17,7 @@ import {
   StatusTag,
   TaskBoard,
   TaskFormDialog,
+  TaskImportDialog,
 } from '../components'
 import { useKeyboardShortcuts } from '../hooks'
 import type { KeyboardShortcut } from '../hooks'
@@ -90,6 +91,7 @@ export function TasksPage() {
   const [isExporting, setIsExporting] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isImportOpen, setIsImportOpen] = useState(false)
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
 
@@ -233,6 +235,12 @@ export function TasksPage() {
     setEditingTask(null)
     setRefreshKey((current) => current + 1)
     notify('success', editingTask ? 'Görev güncellendi' : 'Görev oluşturuldu', savedTask.title)
+  }
+
+  function handleImportSuccess(count: number) {
+    setIsImportOpen(false)
+    setRefreshKey((current) => current + 1)
+    notify('success', 'İçe aktarma tamamlandı', `${count} görev başarıyla sisteme aktarıldı.`)
   }
 
   /** Satır içi düzenleme ve sürükle-bırak için ortak güncelleme yolu. */
@@ -517,6 +525,13 @@ export function TasksPage() {
           <p>Görevlerini oluştur, filtrele ve ilerleme durumlarını takip et.</p>
         </div>
         <div className="page-heading-actions">
+          <Button
+            label="İçe aktar"
+            icon="pi pi-upload"
+            severity="secondary"
+            outlined
+            onClick={() => setIsImportOpen(true)}
+          />
           <SplitButton
             label="Dışa aktar"
             icon="pi pi-download"
@@ -724,10 +739,18 @@ export function TasksPage() {
             selection={selectedTasks}
             selectionMode="checkbox"
             onSelectionChange={(event) => setSelectedTasks(event.value as Task[])}
-            tableStyle={{ minWidth: '76rem' }}
+            tableStyle={{ minWidth: '64rem' }}
             onPage={handlePage}
           >
-            <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
+            <Column
+              selectionMode="multiple"
+              align="center"
+              alignHeader="center"
+              headerClassName="text-center"
+              bodyClassName="text-center"
+              headerStyle={{ width: '3rem', textAlign: 'center' }}
+              style={{ width: '3rem', textAlign: 'center' }}
+            />
             <Column
               header="Görev"
               field="title"
@@ -738,34 +761,82 @@ export function TasksPage() {
                 if (!nextTitle || nextTitle === event.rowData.title) return
                 void applyTaskChange(event.rowData as Task, { title: nextTitle })
               }}
-              style={{ minWidth: '18rem' }}
+              style={{ minWidth: '14rem' }}
             />
             <Column
               header="Durum"
               field="status"
+              align="center"
+              alignHeader="center"
+              headerClassName="text-center"
+              bodyClassName="text-center"
               body={(task: Task) => <StatusTag status={task.status} />}
               editor={statusEditor}
               onCellEditComplete={(event) => {
                 if (event.newValue === event.rowData.status) return
                 void applyTaskChange(event.rowData as Task, { status: event.newValue as TaskStatus })
               }}
-              style={{ minWidth: '10rem' }}
+              headerStyle={{ textAlign: 'center' }}
+              style={{ width: '9.5rem', minWidth: '9.5rem', textAlign: 'center' }}
             />
             <Column
               header="Öncelik"
               field="priority"
+              align="center"
+              alignHeader="center"
+              headerClassName="text-center"
+              bodyClassName="text-center"
               body={(task: Task) => <PriorityTag priority={task.priority} />}
               editor={priorityEditor}
               onCellEditComplete={(event) => {
                 if (event.newValue === event.rowData.priority) return
                 void applyTaskChange(event.rowData as Task, { priority: event.newValue as Priority })
               }}
-              style={{ minWidth: '10rem' }}
+              headerStyle={{ textAlign: 'center' }}
+              style={{ width: '8.5rem', minWidth: '8.5rem', textAlign: 'center' }}
             />
-            <Column header="Kategori" body={categoryTemplate} style={{ minWidth: '9rem' }} />
-            <Column header="Son tarih" body={dueDateTemplate} style={{ minWidth: '8rem' }} />
-            <Column header="Oluşturuldu" body={(task: Task) => formatTaskDate(task.createdAt)} style={{ minWidth: '8rem' }} />
-            <Column header="İşlemler" body={actionsTemplate} frozen alignFrozen="right" style={{ width: '9rem' }} />
+            <Column
+              header="Kategori"
+              align="center"
+              alignHeader="center"
+              headerClassName="text-center"
+              bodyClassName="text-center"
+              body={categoryTemplate}
+              headerStyle={{ textAlign: 'center' }}
+              style={{ width: '9.5rem', minWidth: '9.5rem', textAlign: 'center' }}
+            />
+            <Column
+              header="Son Tarih"
+              align="center"
+              alignHeader="center"
+              headerClassName="text-center"
+              bodyClassName="text-center"
+              body={dueDateTemplate}
+              headerStyle={{ textAlign: 'center' }}
+              style={{ width: '9rem', minWidth: '9rem', textAlign: 'center' }}
+            />
+            <Column
+              header="Oluşturulma"
+              align="center"
+              alignHeader="center"
+              headerClassName="text-center"
+              bodyClassName="text-center"
+              body={(task: Task) => formatTaskDate(task.createdAt)}
+              headerStyle={{ textAlign: 'center', whiteSpace: 'nowrap' }}
+              style={{ width: '9.5rem', minWidth: '9.5rem', textAlign: 'center' }}
+            />
+            <Column
+              header="İşlemler"
+              align="center"
+              alignHeader="center"
+              headerClassName="text-center"
+              bodyClassName="text-center"
+              body={actionsTemplate}
+              frozen
+              alignFrozen="right"
+              headerStyle={{ textAlign: 'center' }}
+              style={{ width: '8rem', minWidth: '8rem', textAlign: 'center' }}
+            />
           </DataTable>
         </section>
       )}
@@ -779,6 +850,13 @@ export function TasksPage() {
           onSaved={handleSaved}
         />
       )}
+
+      <TaskImportDialog
+        visible={isImportOpen}
+        categories={categories}
+        onHide={() => setIsImportOpen(false)}
+        onSuccess={handleImportSuccess}
+      />
 
       {isShortcutsOpen && (
         <KeyboardShortcutsDialog shortcuts={shortcuts} onHide={() => setIsShortcutsOpen(false)} />

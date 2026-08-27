@@ -275,6 +275,65 @@ namespace TaskManagement.API.Services
             return tasks.Count;
         }
 
+        public async Task<List<TaskItemDto>> BulkCreateTasksAsync(Guid userId, BulkTaskCreateDto bulkCreateDto)
+        {
+            if (bulkCreateDto.Tasks == null || bulkCreateDto.Tasks.Count == 0)
+                return new List<TaskItemDto>();
+
+            var validCategoryIds = await _context.Categories
+                .Where(c => c.UserId == userId)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            var now = DateTime.UtcNow;
+            var createdEntities = new List<TaskItem>();
+
+            foreach (var dto in bulkCreateDto.Tasks)
+            {
+                var title = dto.Title?.Trim();
+                if (string.IsNullOrWhiteSpace(title))
+                    continue;
+
+                Guid? categoryId = null;
+                if (dto.CategoryId.HasValue && validCategoryIds.Contains(dto.CategoryId.Value))
+                {
+                    categoryId = dto.CategoryId.Value;
+                }
+
+                var task = new TaskItem
+                {
+                    Id = Guid.NewGuid(),
+                    Title = title.Length > 200 ? title.Substring(0, 200) : title,
+                    Description = dto.Description?.Trim(),
+                    Priority = dto.Priority,
+                    Status = Status.Pending,
+                    DueDate = EnsureUtc(dto.DueDate),
+                    UserId = userId,
+                    CategoryId = categoryId,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                };
+
+                createdEntities.Add(task);
+            }
+
+            if (createdEntities.Count > 0)
+            {
+                await _context.Tasks.AddRangeAsync(createdEntities);
+                await _context.SaveChangesAsync();
+            }
+
+            var createdIds = createdEntities.Select(t => t.Id).ToList();
+            var result = await _context.Tasks
+                .AsNoTracking()
+                .Include(t => t.Category)
+                .Where(t => t.UserId == userId && createdIds.Contains(t.Id))
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
+
+            return _mapper.Map<List<TaskItemDto>>(result);
+        }
+
         private static DateTime? EnsureUtc(DateTime? value)
         {
             return value.HasValue ? NormalizeUtc(value.Value) : null;

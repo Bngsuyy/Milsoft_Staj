@@ -99,6 +99,15 @@ namespace TaskManagement.API.DTOs
         public int AffectedCount { get; set; }
     }
 
+    // Toplu Görev Ekleme DTO'su (Bulk Create / Import)
+    public class BulkTaskCreateDto
+    {
+        [Required(ErrorMessage = "En az bir görev gönderilmelidir.")]
+        [MinLength(1, ErrorMessage = "En az bir görev gönderilmelidir.")]
+        [MaxLength(500, ErrorMessage = "Tek seferde en fazla 500 görev içe aktarılabilir.")]
+        public List<CreateTaskDto> Tasks { get; set; } = new();
+    }
+
     public class TaskStatisticsDto
     {
         public int Total { get; set; }

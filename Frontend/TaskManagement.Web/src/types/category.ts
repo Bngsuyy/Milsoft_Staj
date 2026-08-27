@@ -5,6 +5,7 @@ export interface Category {
   name: string
   description: string | null
   color: string
+  taskCount?: number
   createdAt: IsoDateString
 }
 
