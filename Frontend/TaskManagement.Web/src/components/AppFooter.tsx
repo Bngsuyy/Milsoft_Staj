@@ -4,7 +4,7 @@ export function AppFooter() {
   return (
     <footer className="app-footer">
       <div className="app-footer-brand">
-        <img className="app-footer-logo" src="/favicon.svg?v=2" alt="" aria-hidden="true" />
+        <img className="app-footer-logo" src="/favicon.svg?v=3" alt="MilSOFT" aria-hidden="true" />
         <div>
           <strong>MilSOFT Görev Yönetimi</strong>
           <span>© {currentYear} · Kurumsal görev yönetim sistemi</span>

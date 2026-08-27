@@ -153,6 +153,18 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // 10. CORS Middleware
+app.UseMiddleware<ExceptionMiddleware>();
+
+// 9. HTTP Request Pipeline Yapılandırması
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+// 10. CORS Middleware
 app.UseCors("AllowFrontend");
 
 // 11. Auth Middleware'leri
@@ -161,6 +173,7 @@ app.UseAuthorization();
 
 // 12. Controller Endpoint Mapping
 app.MapControllers();
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.Run();
 

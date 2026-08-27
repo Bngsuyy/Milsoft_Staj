@@ -12,7 +12,7 @@ export function AuthLayout() {
         <section className="auth-brand" aria-label="Uygulama tanıtımı">
           <div className="auth-brand-content">
             <span className="auth-logo inline-flex align-items-center justify-content-center">
-              <img src="/favicon.svg?v=2" alt="" aria-hidden="true" />
+              <img src="/favicon.svg?v=3" alt="MilSOFT" aria-hidden="true" />
             </span>
             <h1 className="auth-product-title">Task Management System</h1>
             <p className="auth-message">

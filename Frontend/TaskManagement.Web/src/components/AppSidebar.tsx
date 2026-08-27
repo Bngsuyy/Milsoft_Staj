@@ -22,7 +22,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       <div className="sidebar-brand-row">
         <NavLink className="sidebar-brand" to="/dashboard" onClick={onClose}>
           <span className="app-mark" aria-hidden="true">
-            <img src="/favicon.svg?v=2" alt="" />
+            <img src="/favicon.svg?v=3" alt="MilSOFT" />
           </span>
           <span>
             <strong>Task Management</strong>
