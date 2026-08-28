@@ -7,6 +7,7 @@ CREATE TABLE "Users" (
     "PasswordHash" varchar(255) NOT NULL,
     "FirstName" varchar(50) NOT NULL,
     "LastName" varchar(50) NOT NULL,
+    "ProfileImagePath" varchar(120),
     "CreatedAt" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UpdatedAt" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "IsActive" boolean NOT NULL DEFAULT TRUE,
@@ -19,6 +20,8 @@ CREATE TABLE "Categories" (
     "Name" varchar(100) NOT NULL,
     "Description" varchar(500),
     "Color" varchar(7) NOT NULL DEFAULT '#007bff',
+    "Icon" varchar(100),
+    "ImageUrl" text,
     "CreatedAt" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UserId" uuid NOT NULL,
     CONSTRAINT "FK_Categories_Users_UserId"
@@ -81,7 +84,7 @@ CREATE INDEX "IX_TaskComments_UserId" ON "TaskComments" ("UserId");
 
 INSERT INTO "Users" (
     "Id", "Username", "Email", "PasswordHash", "FirstName", "LastName",
-    "CreatedAt", "UpdatedAt", "IsActive"
+    "ProfileImagePath", "CreatedAt", "UpdatedAt", "IsActive"
 ) VALUES (
     '11111111-1111-1111-1111-111111111111',
     'demouser',
@@ -89,6 +92,7 @@ INSERT INTO "Users" (
     '$2a$11$dPWaszZ8p.60zHUUpZRNr.1.2gaCXoeYz1FqAR/U.ZYttsmttFNmS',
     'Demo',
     'User',
+    NULL,
     '2025-08-18 07:00:00+00',
     '2025-08-18 07:00:00+00',
     TRUE

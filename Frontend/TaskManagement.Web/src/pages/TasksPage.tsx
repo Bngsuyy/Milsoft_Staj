@@ -439,8 +439,14 @@ export function TasksPage() {
 
   const categoryTemplate = (task: Task) => task.category ? (
     <span className="category-cell">
-      <span className="category-color" style={{ backgroundColor: task.category.color }} aria-hidden="true" />
-      {task.category.name}
+      {task.category.imageUrl ? (
+        <img src={task.category.imageUrl} alt="" className="category-cell-mini-img" />
+      ) : task.category.icon ? (
+        <i className={task.category.icon} style={{ color: task.category.color, fontSize: '0.85rem' }} />
+      ) : (
+        <span className="category-color" style={{ backgroundColor: task.category.color }} aria-hidden="true" />
+      )}
+      <span>{task.category.name}</span>
     </span>
   ) : <span className="muted-cell">Kategorisiz</span>
 

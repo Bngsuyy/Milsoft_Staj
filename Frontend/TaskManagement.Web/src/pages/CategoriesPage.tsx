@@ -139,10 +139,28 @@ export function CategoriesPage() {
       ) : categories.length > 0 ? (
         <section className="category-grid" aria-label={`${categories.length} kategori`}>
           {categories.map((category) => (
-            <article className="category-card" key={category.id}>
+            <article className="category-card" key={category.id} style={{ borderTopColor: category.color }}>
+              {category.imageUrl && (
+                <div className="category-card-banner">
+                  <img src={category.imageUrl} alt={category.name} className="category-card-banner-img" />
+                </div>
+              )}
+
               <div className="category-card-heading">
-                <span className="category-card-icon" style={{ color: category.color }} aria-hidden="true">
-                  <i className="pi pi-tag" />
+                <span
+                  className="category-card-icon"
+                  style={{
+                    backgroundColor: `${category.color}15`,
+                    color: category.color,
+                    borderColor: `${category.color}35`,
+                  }}
+                  aria-hidden="true"
+                >
+                  {category.imageUrl ? (
+                    <img src={category.imageUrl} alt={category.name} className="category-mini-icon-img" />
+                  ) : (
+                    <i className={category.icon || 'pi pi-tag'} />
+                  )}
                 </span>
                 <div className="category-card-actions">
                   <Button
@@ -179,8 +197,13 @@ export function CategoriesPage() {
               </div>
 
               <footer className="category-card-footer">
-                <span>{category.color.toUpperCase()}</span>
-                <time dateTime={category.createdAt}>{formatTaskDate(category.createdAt)}</time>
+                <span className="category-card-task-count">
+                  <i className="pi pi-list-check" aria-hidden="true" /> {category.taskCount ?? 0} görev
+                </span>
+                <div className="category-card-footer-meta">
+                  <span className="category-hex-badge">{category.color.toUpperCase()}</span>
+                  <time dateTime={category.createdAt}>{formatTaskDate(category.createdAt)}</time>
+                </div>
               </footer>
             </article>
           ))}

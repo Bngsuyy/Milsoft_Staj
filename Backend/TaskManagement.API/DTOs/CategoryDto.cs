@@ -9,6 +9,8 @@ namespace TaskManagement.API.DTOs
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string Color { get; set; } = string.Empty;
+        public string? Icon { get; set; }
+        public string? ImageUrl { get; set; }
         public int TaskCount { get; set; }
         public DateTime CreatedAt { get; set; }
     }
@@ -25,6 +27,11 @@ namespace TaskManagement.API.DTOs
 
         [RegularExpression("^#[0-9a-fA-F]{6}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz (ör: #FF5733).")]
         public string Color { get; set; } = "#007bff";
+
+        [StringLength(100, ErrorMessage = "İkon adı en fazla 100 karakter olabilir.")]
+        public string? Icon { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 
     // Kategori Güncelleme DTO'su (UpdateCategoryDto)
@@ -39,5 +46,10 @@ namespace TaskManagement.API.DTOs
 
         [RegularExpression("^#[0-9a-fA-F]{6}$", ErrorMessage = "Geçerli bir Hex renk kodu giriniz.")]
         public string Color { get; set; } = "#007bff";
+
+        [StringLength(100, ErrorMessage = "İkon adı en fazla 100 karakter olabilir.")]
+        public string? Icon { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 }

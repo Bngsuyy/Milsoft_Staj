@@ -30,6 +30,8 @@ namespace TaskManagement.API.Services
                     Name = c.Name,
                     Description = c.Description,
                     Color = c.Color,
+                    Icon = c.Icon,
+                    ImageUrl = c.ImageUrl,
                     CreatedAt = c.CreatedAt,
                     TaskCount = _context.Tasks.Count(t => t.UserId == userId && t.CategoryId == c.Id)
                 })
@@ -49,6 +51,8 @@ namespace TaskManagement.API.Services
                     Name = c.Name,
                     Description = c.Description,
                     Color = c.Color,
+                    Icon = c.Icon,
+                    ImageUrl = c.ImageUrl,
                     CreatedAt = c.CreatedAt,
                     TaskCount = _context.Tasks.Count(t => t.UserId == userId && t.CategoryId == c.Id)
                 })
@@ -74,13 +78,16 @@ namespace TaskManagement.API.Services
             var category = _mapper.Map<Category>(createCategoryDto);
             category.Name = name;
             category.Description = createCategoryDto.Description?.Trim();
+            category.Icon = string.IsNullOrWhiteSpace(createCategoryDto.Icon) ? null : createCategoryDto.Icon.Trim();
+            category.ImageUrl = string.IsNullOrWhiteSpace(createCategoryDto.ImageUrl) ? null : createCategoryDto.ImageUrl.Trim();
             category.UserId = userId;
             category.CreatedAt = DateTime.UtcNow;
 
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<CategoryDto>(category);
+            // TaskCount alanının doğru dolması için kaydı yeniden okuyoruz.
+            return await GetCategoryByIdAsync(category.Id, userId);
         }
 
         public async Task<CategoryDto> UpdateCategoryAsync(Guid id, UpdateCategoryDto updateCategoryDto, Guid userId)
@@ -106,11 +113,14 @@ namespace TaskManagement.API.Services
             _mapper.Map(updateCategoryDto, category);
             category.Name = name;
             category.Description = updateCategoryDto.Description?.Trim();
+            category.Icon = string.IsNullOrWhiteSpace(updateCategoryDto.Icon) ? null : updateCategoryDto.Icon.Trim();
+            category.ImageUrl = string.IsNullOrWhiteSpace(updateCategoryDto.ImageUrl) ? null : updateCategoryDto.ImageUrl.Trim();
 
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<CategoryDto>(category);
+            // TaskCount alanının doğru dolması için kaydı yeniden okuyoruz.
+            return await GetCategoryByIdAsync(category.Id, userId);
         }
 
         public async Task<bool> DeleteCategoryAsync(Guid id, Guid userId)

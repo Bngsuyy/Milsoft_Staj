@@ -6,6 +6,8 @@ namespace TaskManagement.API.Entities
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string Color { get; set; } = "#007bff";
+        public string? Icon { get; set; }
+        public string? ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Foreign Key

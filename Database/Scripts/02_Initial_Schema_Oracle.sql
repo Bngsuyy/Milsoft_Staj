@@ -5,6 +5,7 @@ CREATE TABLE "Users" (
     "PasswordHash" VARCHAR2(255 CHAR) NOT NULL,
     "FirstName" VARCHAR2(50 CHAR) NOT NULL,
     "LastName" VARCHAR2(50 CHAR) NOT NULL,
+    "ProfileImagePath" VARCHAR2(120 CHAR),
     "CreatedAt" TIMESTAMP(7) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "UpdatedAt" TIMESTAMP(7) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "IsActive" NUMBER(1) DEFAULT 1 NOT NULL,
@@ -18,6 +19,8 @@ CREATE TABLE "Categories" (
     "Name" VARCHAR2(100 CHAR) NOT NULL,
     "Description" VARCHAR2(500 CHAR),
     "Color" VARCHAR2(7 CHAR) DEFAULT '#007bff' NOT NULL,
+    "Icon" VARCHAR2(100 CHAR),
+    "ImageUrl" CLOB,
     "CreatedAt" TIMESTAMP(7) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "UserId" RAW(16) NOT NULL,
     CONSTRAINT "FK_Categories_Users_UserId"
@@ -80,7 +83,7 @@ CREATE INDEX "IX_TaskComments_UserId" ON "TaskComments" ("UserId");
 
 INSERT INTO "Users" (
     "Id", "Username", "Email", "PasswordHash", "FirstName", "LastName",
-    "CreatedAt", "UpdatedAt", "IsActive"
+    "ProfileImagePath", "CreatedAt", "UpdatedAt", "IsActive"
 ) VALUES (
     HEXTORAW('11111111111111111111111111111111'),
     'demouser',
@@ -88,6 +91,7 @@ INSERT INTO "Users" (
     '$2a$11$dPWaszZ8p.60zHUUpZRNr.1.2gaCXoeYz1FqAR/U.ZYttsmttFNmS',
     'Demo',
     'User',
+    NULL,
     TO_TIMESTAMP('2025-08-18 07:00:00', 'YYYY-MM-DD HH24:MI:SS'),
     TO_TIMESTAMP('2025-08-18 07:00:00', 'YYYY-MM-DD HH24:MI:SS'),
     1

@@ -3,7 +3,10 @@
 ## Tablolar
 
 - `Users`: kullanıcı ve BCrypt parola hash'i. `Username` ve `Email` benzersizdir.
+  `ProfileImagePath` yüklenen profil görselinin göreli yolunu tutar (opsiyonel).
 - `Categories`: kullanıcıya ait kategori. `(UserId, Name)` benzersizdir.
+  `Icon` bir PrimeIcons sınıf adı (ör. `pi pi-tag`), `ImageUrl` ise kategori görselinin
+  adresi veya gömülü data URI'sidir; ikisi de opsiyoneldir.
 - `Tasks`: görev, öncelik, durum, tarih ve kategori ilişkisi.
 - `TaskComments`: göreve ve yorum sahibine bağlı metin kayıtları.
 - `TaskAttachments`: fiziksel dosyanın güvenli göreli yolu ve metadatası.

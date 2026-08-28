@@ -34,6 +34,8 @@ namespace TaskManagement.API.Data
                 entity.Property(c => c.Name).HasMaxLength(100).IsRequired();
                 entity.Property(c => c.Description).HasMaxLength(500);
                 entity.Property(c => c.Color).HasMaxLength(7).IsRequired();
+                entity.Property(c => c.Icon).HasMaxLength(100);
+                entity.Property(c => c.ImageUrl);
                 entity.HasIndex(c => new { c.UserId, c.Name }).IsUnique();
             });
 

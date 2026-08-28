@@ -5,6 +5,8 @@ export interface Category {
   name: string
   description: string | null
   color: string
+  icon?: string | null
+  imageUrl?: string | null
   taskCount?: number
   createdAt: IsoDateString
 }
@@ -13,6 +15,8 @@ export interface CreateCategory {
   name: string
   description?: string | null
   color: string
+  icon?: string | null
+  imageUrl?: string | null
 }
 
 export type UpdateCategory = CreateCategory

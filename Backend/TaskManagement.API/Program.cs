@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
@@ -141,18 +141,6 @@ var app = builder.Build();
 app.UseStaticFiles();
 
 // 8. Global Exception Handling Middleware
-app.UseMiddleware<ExceptionMiddleware>();
-
-// 9. HTTP Request Pipeline Yapılandırması
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-// 10. CORS Middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
 // 9. HTTP Request Pipeline Yapılandırması
