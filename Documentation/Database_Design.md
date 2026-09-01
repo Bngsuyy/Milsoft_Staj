@@ -53,6 +53,18 @@ ConnectionStrings__Oracle=User Id=taskmanagement;Password=...;Data Source=localh
 
 EF migration dosyaları PostgreSQL provider'ı ile üretilmiştir. Oracle temiz kurulumu için Oracle scripti kullanılmalıdır; runtime `UseOracle` üzerinden aynı entity modelini kullanır.
 
+### Sağlayıcı uyumluluk testi
+
+Backend test paketi, hem Npgsql hem Oracle EF Core sağlayıcısıyla modeli yükler ve beş tablonun
+tam kurulum SQL'inin üretilebildiğini doğrular. Bu test veritabanı bağlantısı gerektirmez:
+
+```powershell
+dotnet test Backend/TaskManagement.API.Tests/TaskManagement.API.Tests.csproj
+```
+
+Canlı ortam kabulünde ayrıca ilgili Oracle şemasına `02_Initial_Schema_Oracle.sql` uygulanmalı ve
+API, `DatabaseProvider=Oracle` yapılandırmasıyla çalıştırılmalıdır.
+
 ## Bağlantı bilgileri
 
 Parolalar depoda saklanmaz. `appsettings.Development.json` yalnızca parolasız bağlantı

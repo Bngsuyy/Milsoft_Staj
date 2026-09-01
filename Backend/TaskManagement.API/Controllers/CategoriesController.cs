@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.API.DTOs;
+using TaskManagement.API.Models;
 using TaskManagement.API.Services.Interfaces;
 
 namespace TaskManagement.API.Controllers
@@ -9,6 +10,7 @@ namespace TaskManagement.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
+    [Produces("application/json")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -29,7 +31,8 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [ProducesResponseType(typeof(List<CategoryDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<CategoryDto>>> GetAll()
         {
             var userId = GetUserId();
             var categories = await _categoryService.GetAllCategoriesAsync(userId);
@@ -37,7 +40,8 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CategoryDto>> GetById(Guid id)
         {
             var userId = GetUserId();
             var category = await _categoryService.GetCategoryByIdAsync(id, userId);
@@ -45,7 +49,8 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateCategoryDto createCategoryDto)
+        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status201Created)]
+        public async Task<ActionResult<CategoryDto>> Create([FromBody] CreateCategoryDto createCategoryDto)
         {
             var userId = GetUserId();
             var createdCategory = await _categoryService.CreateCategoryAsync(createCategoryDto, userId);
@@ -53,7 +58,8 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryDto updateCategoryDto)
+        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CategoryDto>> Update(Guid id, [FromBody] UpdateCategoryDto updateCategoryDto)
         {
             var userId = GetUserId();
             var updatedCategory = await _categoryService.UpdateCategoryAsync(id, updateCategoryDto, userId);
@@ -61,12 +67,18 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var userId = GetUserId();
             var result = await _categoryService.DeleteCategoryAsync(id, userId);
             if (!result)
-                return NotFound(new { message = "Silinecek kategori bulunamadı." });
+                return NotFound(new ErrorDetails
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Silinecek kategori bulunamadı.",
+                    TraceId = HttpContext.TraceIdentifier
+                });
 
             return NoContent();
         }

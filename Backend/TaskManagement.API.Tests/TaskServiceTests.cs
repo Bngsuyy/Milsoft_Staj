@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using TaskManagement.API;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs;
@@ -15,14 +16,6 @@ namespace TaskManagement.API.Tests
 {
     public class TaskServiceTests
     {
-        private readonly IMapper _mapper;
-
-        public TaskServiceTests()
-        {
-            _mapper = new MapperConfiguration(configuration =>
-                configuration.AddProfile<MappingProfile>()).CreateMapper();
-        }
-
         [Fact]
         public async Task GetAllTasks_ReturnsOnlyAuthenticatedUsersTasks()
         {
@@ -154,8 +147,9 @@ namespace TaskManagement.API.Tests
         {
             return new TaskService(
                 context,
-                new MapperConfiguration(configuration =>
-                    configuration.AddProfile<MappingProfile>()).CreateMapper(),
+                new MapperConfiguration(
+                    configuration => configuration.AddProfile<MappingProfile>(),
+                    NullLoggerFactory.Instance).CreateMapper(),
                 new NoopAttachmentService());
         }
 

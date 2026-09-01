@@ -2,6 +2,8 @@
 
 Kişisel görev yönetimi uygulaması. .NET 8 Web API backend'i ile React + PrimeReact frontend'inden oluşur.
 
+Demo: [YouTube'da izle](https://www.youtube.com/watch?v=jcjtUVQBXxg)
+
 ## Proje yapısı
 
 ```text
@@ -50,6 +52,10 @@ $env:JwtSettings__SecretKey='EN_AZ_32_BAYTLIK_GELISTIRME_ANAHTARI'
 
 Production'da bu değerler ortam değişkeni veya bir secret yöneticisi üzerinden sağlanmalıdır.
 
+AutoMapper 15+ çift lisanslıdır. Üretim ortamında kuruluşunuza ait lisans anahtarını depoya
+yazmadan `AUTOMAPPER_LICENSE_KEY` ortam değişkeniyle sağlayın. Lisans anahtarı uygulama
+özelliklerini etkilemez; AutoMapper anahtarı yalnızca kendi lisans doğrulama günlüğü için okur.
+
 ### Çalıştırma
 
 ```powershell
@@ -65,7 +71,12 @@ Demo kullanıcı: `demouser` / `Demo123!`
 
 ```powershell
 dotnet test Backend/TaskManagement.API.Tests/TaskManagement.API.Tests.csproj
+dotnet list Backend/TaskManagement.API/TaskManagement.API.csproj package --vulnerable --include-transitive
 ```
+
+Test paketi, PostgreSQL ve Oracle sağlayıcılarının aynı EF modelinden eksiksiz kurulum SQL'i
+üretebildiğini de doğrular. Canlı Oracle kurulumu için `Documentation/Database_Design.md`
+içindeki temiz kurulum adımlarını kullanın.
 
 ## Frontend'i çalıştırma
 
@@ -83,6 +94,7 @@ API adresi `Frontend/TaskManagement.Web/.env.development` içindeki `VITE_API_BA
 npm run build   # tip kontrolü + production build
 npm run lint    # ESLint
 npm run test    # Vitest
+npm audit --omit=dev # production bağımlılık güvenlik taraması
 ```
 
 ## Klavye kısayolları (Görevler ekranı)
@@ -101,3 +113,12 @@ npm run test    # Vitest
 
 - API uçları: `Documentation/API_Endpoints.md`
 - Veritabanı tasarımı ve kurulumu: `Documentation/Database_Design.md`
+
+## Tek komutla teslim doğrulaması
+
+Gizli bilgi taraması, backend test/Release build, migration modeli, NuGet/npm güvenliği,
+frontend test/lint ve production build kontrollerinin tamamını çalıştırmak için:
+
+```powershell
+.\scripts\Test-Delivery.ps1
+```

@@ -101,6 +101,26 @@ public sealed class ApiIntegrationTests : IClassFixture<ApiWebApplicationFactory
         Assert.Equal(1, statistics.GetProperty("pending").GetInt32());
     }
 
+    [Fact]
+    public async Task ApiErrors_UseDocumentedErrorDetailsContract()
+    {
+        using var client = CreateClient();
+
+        var unauthorizedResponse = await client.GetAsync("/api/Tasks");
+        Assert.Equal(HttpStatusCode.Unauthorized, unauthorizedResponse.StatusCode);
+        var unauthorizedError = await unauthorizedResponse.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(401, unauthorizedError.GetProperty("statusCode").GetInt32());
+        Assert.False(string.IsNullOrWhiteSpace(unauthorizedError.GetProperty("message").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(unauthorizedError.GetProperty("traceId").GetString()));
+
+        var validationResponse = await client.PostAsJsonAsync("/api/Auth/register", new { });
+        Assert.Equal(HttpStatusCode.BadRequest, validationResponse.StatusCode);
+        var validationError = await validationResponse.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(400, validationError.GetProperty("statusCode").GetInt32());
+        Assert.False(string.IsNullOrWhiteSpace(validationError.GetProperty("message").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(validationError.GetProperty("traceId").GetString()));
+    }
+
     private HttpClient CreateClient()
     {
         return _factory.CreateClient(new WebApplicationFactoryClientOptions

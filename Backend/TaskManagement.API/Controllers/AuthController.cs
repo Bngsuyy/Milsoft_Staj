@@ -8,6 +8,7 @@ namespace TaskManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -21,7 +22,8 @@ namespace TaskManagement.API.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] CreateUserDto registerDto)
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
+        public async Task<ActionResult<UserDto>> Register([FromBody] CreateUserDto registerDto)
         {
             var user = await _authService.RegisterAsync(registerDto);
             return StatusCode(StatusCodes.Status201Created, user);
@@ -29,15 +31,17 @@ namespace TaskManagement.API.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginDto loginDto)
         {
             var token = await _authService.LoginAsync(loginDto);
-            return Ok(new { token });
+            return Ok(new LoginResponseDto { Token = token });
         }
 
         [HttpGet("profile")]
         [Authorize]
-        public async Task<IActionResult> GetProfile()
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<UserDto>> GetProfile()
         {
             var user = await _userService.GetByIdAsync(GetUserId());
             return Ok(user);
@@ -45,7 +49,8 @@ namespace TaskManagement.API.Controllers
 
         [HttpPut("profile")]
         [Authorize]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserDto updateUserDto)
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<UserDto>> UpdateProfile([FromBody] UpdateUserDto updateUserDto)
         {
             var user = await _userService.UpdateUserAsync(GetUserId(), updateUserDto);
             return Ok(user);
@@ -55,7 +60,8 @@ namespace TaskManagement.API.Controllers
         [Authorize]
         [Consumes("multipart/form-data")]
         [RequestSizeLimit(5 * 1024 * 1024 + 64 * 1024)]
-        public async Task<IActionResult> UploadProfileImage(IFormFile file)
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<UserDto>> UploadProfileImage(IFormFile file)
         {
             var user = await _userService.UploadProfileImageAsync(GetUserId(), file);
             return Ok(user);
@@ -63,7 +69,8 @@ namespace TaskManagement.API.Controllers
 
         [HttpDelete("profile/image")]
         [Authorize]
-        public async Task<IActionResult> DeleteProfileImage()
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<UserDto>> DeleteProfileImage()
         {
             var user = await _userService.DeleteProfileImageAsync(GetUserId());
             return Ok(user);

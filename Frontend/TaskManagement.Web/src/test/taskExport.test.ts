@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { exportTasksToPdf } from '../utils/taskExport'
+import { exportTasksToExcel, exportTasksToPdf } from '../utils/taskExport'
 import { Priority, TaskStatus } from '../types'
 import type { Task } from '../types'
 
@@ -7,6 +7,10 @@ const pdfMocks = vi.hoisted(() => ({
   createPdf: vi.fn(),
   addVirtualFileSystem: vi.fn(),
   download: vi.fn(),
+}))
+
+const fileSaverMocks = vi.hoisted(() => ({
+  saveAs: vi.fn(),
 }))
 
 vi.mock('pdfmake/build/pdfmake', () => ({
@@ -17,6 +21,8 @@ vi.mock('pdfmake/build/pdfmake', () => ({
 }))
 
 vi.mock('pdfmake/build/vfs_fonts', () => ({ default: {} }))
+
+vi.mock('file-saver', () => ({ saveAs: fileSaverMocks.saveAs }))
 
 const task: Task = {
   id: 'task-1',
@@ -81,4 +87,20 @@ describe('exportTasksToPdf', () => {
     expect(pdfMocks.download).toHaveBeenCalledTimes(1)
     expect(pdfMocks.download.mock.calls[0][0]).toMatch(/^gorevler-\d{4}-\d{2}-\d{2}\.pdf$/)
   })
+})
+
+describe('exportTasksToExcel', () => {
+  beforeEach(() => {
+    fileSaverMocks.saveAs.mockReset()
+  })
+
+  it('güvenlik güncellemesi uygulanmış ExcelJS bağımlılığıyla workbook üretir', async () => {
+    await exportTasksToExcel([task])
+
+    expect(fileSaverMocks.saveAs).toHaveBeenCalledTimes(1)
+    const [blob, fileName] = fileSaverMocks.saveAs.mock.calls[0]
+    expect(blob).toBeInstanceOf(Blob)
+    expect(blob.size).toBeGreaterThan(0)
+    expect(fileName).toMatch(/^gorevler-\d{4}-\d{2}-\d{2}\.xlsx$/)
+  }, 30_000)
 })

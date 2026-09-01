@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,8 +9,10 @@ using System.Text.Json.Serialization;
 using TaskManagement.API;
 using TaskManagement.API.Data;
 using TaskManagement.API.Middlewares;
+using TaskManagement.API.Models;
 using TaskManagement.API.Services;
 using TaskManagement.API.Services.Interfaces;
+using TaskManagement.API.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 var maxFileSize = builder.Configuration.GetValue<long?>("FileUpload:MaxFileSizeBytes")
@@ -35,11 +38,34 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var validationErrors = context.ModelState.Values
+            .SelectMany(value => value.Errors)
+            .Select(error => error.ErrorMessage)
+            .Where(message => !string.IsNullOrWhiteSpace(message))
+            .Distinct()
+            .ToArray();
+
+        return new BadRequestObjectResult(new ErrorDetails
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            Message = validationErrors.Length == 0
+                ? "İstek doğrulaması başarısız oldu."
+                : string.Join(" ", validationErrors),
+            TraceId = context.HttpContext.TraceIdentifier
+        });
+    };
+});
 builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = maxFileSize + 64 * 1024);
 
-// 3. AutoMapper Servisini Kaydet
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+// 3. AutoMapper Servisini Kaydet. AutoMapper 13+ ile DI desteği çekirdek pakettedir.
+// Lisans anahtarı depoda tutulmaz; paket AUTOMAPPER_LICENSE_KEY ortam değişkenini
+// otomatik olarak okuyabilir.
+builder.Services.AddAutoMapper(_ => { }, typeof(MappingProfile));
 
 // 4. Servis Katmanı IoC Kayıtları
 builder.Services.AddScoped<IUserService, UserService>();
@@ -78,17 +104,35 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.FromMinutes(1)
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = async context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(new ErrorDetails
+            {
+                StatusCode = StatusCodes.Status401Unauthorized,
+                Message = "JWT eksik, geçersiz veya süresi dolmuş.",
+                TraceId = context.HttpContext.TraceIdentifier
+            }.ToString());
+        }
+    };
 });
 
 // 6. Swagger JWT Bearer Güvenlik Dokümantasyonu
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TaskManagement.API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Task Management API",
+        Version = "v1"
+    });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Örnek: 'Bearer eyJhbGciOi...'",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
@@ -96,20 +140,9 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+    c.CustomOperationIds(apiDescription =>
+        $"{apiDescription.ActionDescriptor.RouteValues["controller"]}_{apiDescription.ActionDescriptor.RouteValues["action"]}");
+    c.OperationFilter<SwaggerOperationFilter>();
 });
 
 // 7. Veritabanı Provider Seçimi (PostgreSQL veya Oracle)
@@ -147,7 +180,16 @@ app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Task Management API v1");
+        options.DocumentTitle = "Task Management API - Swagger";
+        options.DisplayOperationId();
+        options.DisplayRequestDuration();
+        options.EnablePersistAuthorization();
+        options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
+        options.DefaultModelsExpandDepth(1);
+    });
 }
 
 app.UseHttpsRedirection();
@@ -161,7 +203,7 @@ app.UseAuthorization();
 
 // 12. Controller Endpoint Mapping
 app.MapControllers();
-app.MapGet("/", () => Results.Redirect("/swagger"));
+app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 
 app.Run();
 

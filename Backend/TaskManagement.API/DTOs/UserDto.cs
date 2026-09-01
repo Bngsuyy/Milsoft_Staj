@@ -65,4 +65,9 @@ namespace TaskManagement.API.DTOs
         [Required(ErrorMessage = "Şifre zorunludur.")]
         public string Password { get; set; } = string.Empty;
     }
+
+    public class LoginResponseDto
+    {
+        public string Token { get; set; } = string.Empty;
+    }
 }
